@@ -1,0 +1,21 @@
+{
+  "name": "bookmarks-manager",
+  "version": "1.0.0",
+  "description": "Bookmark manager app made with NodeJS, Express and PostgreSQL 📌",
+  "main": "index.js",
+  "author": "Ariel Gerstein <contact@arielgerstein.com>",
+  "license": "MIT",
+  "engines": {
+    "node": "8.11.0",
+    "yarn": "1.3.2"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "http": "^0.0.0",
+    "pg": "^7.4.3",
+    "ramda": "^0.25.0",
+    "sequelize": "^4.38.0",
+    "sequelize-values": "^1.1.0"
+  }
+}
