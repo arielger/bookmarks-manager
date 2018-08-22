@@ -24,7 +24,8 @@
     "*.{js,json,css,md}": [
       "prettier --write",
       "git add"
-    ]
+    ],
+    "*.{js,jsx}": "eslint"
   },
   "dependencies": {
     "bcrypt": "^3.0.0",

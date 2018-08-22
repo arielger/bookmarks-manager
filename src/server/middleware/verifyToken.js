@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 
+// eslint-disable-next-line consistent-return
 const verifyToken = (req, res, next) => {
   const token = req.headers["x-access-token"];
 
