@@ -1,9 +1,8 @@
 const express = require("express");
-const http = require("http");
 const bodyParser = require("body-parser");
+const dotenv = require("dotenv");
 const config = require("./config");
 const router = require("./router");
-const dotenv = require("dotenv");
 
 dotenv.config();
 
@@ -18,5 +17,6 @@ app.use(
 router.set(app);
 
 app.listen(config.port, () =>
-  console.log(`App listening on port ${config.port}`)
+  // eslint-disable-next-line no-console
+  console.log(`App listening on port ${config.port} 👋`)
 );

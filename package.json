@@ -11,6 +11,7 @@
   },
   "scripts": {
     "server": "node ./src/server/index.js",
+    "lint:js": "./node_modules/.bin/eslint --ext=js --ext=jsx .",
     "db:seed:all": "./node_modules/.bin/sequelize db:seed:all",
     "db:seed:undo:all": "./node_modules/.bin/sequelize db:seed:undo:all"
   },
@@ -40,6 +41,12 @@
     "sequelize-values": "^1.1.0"
   },
   "devDependencies": {
+    "eslint": "^5.4.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-prettier": "^3.0.1",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-react": "^7.11.1",
     "husky": "^1.0.0-rc.13",
     "lint-staged": "^7.2.2",
     "prettier": "1.14.2"

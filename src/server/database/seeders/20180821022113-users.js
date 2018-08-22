@@ -1,7 +1,7 @@
-"use strict";
 const bcrypt = require("bcrypt");
 const faker = require("faker");
 const R = require("ramda");
+/* eslint-disable no-console */
 
 const generateRandomUser = () => {
   const username = faker.internet.userName();
@@ -31,7 +31,7 @@ const generateRandomBookmark = userId => ({
 });
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async queryInterface => {
     const users = R.times(generateRandomUser, 5);
     const dbUsers = await queryInterface.bulkInsert("users", users, {
       returning: true
@@ -43,7 +43,7 @@ module.exports = {
       R.flatten
     )(dbUsers);
 
-    const dbTags = await queryInterface.bulkInsert("tags", tags, {
+    queryInterface.bulkInsert("tags", tags, {
       returning: true
     });
 
@@ -53,10 +53,10 @@ module.exports = {
       R.flatten
     )(dbUsers);
 
-    const dbBookmarks = await queryInterface.bulkInsert("bookmarks", bookmarks);
+    queryInterface.bulkInsert("bookmarks", bookmarks);
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async queryInterface => {
     console.log("🗑 Delete bookmarks");
     await queryInterface.bulkDelete("bookmarks", null, {});
 

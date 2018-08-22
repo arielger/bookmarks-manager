@@ -2,12 +2,11 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("./model");
 const userService = require("./service");
-const config = require("../../config");
 
-const signUp = (req, res, next) => {
+const signUp = (req, res) => {
   const { firstName, lastName, username, password } = req.body;
 
-  const hashedPassword = bcrypt.hashSync(req.body.password, 8);
+  const hashedPassword = bcrypt.hashSync(password, 8);
 
   userService
     .add({
@@ -26,7 +25,7 @@ const signUp = (req, res, next) => {
         token
       });
     })
-    .catch(err => res.status(500).send());
+    .catch(err => res.status(500).send(err));
 };
 
 const me = (req, res) => {
@@ -37,10 +36,12 @@ const me = (req, res) => {
       if (!user) return res.status(404).send("User not found");
       return res.status(200).send(user);
     })
-    .catch(err => res.status(500).send("There was a problem finding the user"));
+    .catch(err =>
+      res.status(500).send(`There was a problem finding the user: ${err}`)
+    );
 };
 
-const logIn = (req, res, next) => {
+const logIn = (req, res) => {
   const { username, password } = req.body;
 
   // Check if user with the username exists
@@ -63,12 +64,12 @@ const logIn = (req, res, next) => {
         expiresIn: "24h"
       });
 
-      res.status(200).send({ auth: true, token });
+      return res.status(200).send({ auth: true, token });
     })
-    .catch(err => res.status(500).send("Error on the server"));
+    .catch(err => res.status(500).send(`Error on the server: ${err}`));
 };
 
-const logOut = (req, res, next) => {
+const logOut = (req, res) => {
   res.status(200).send({ auth: false, token: null });
 };
 

@@ -22,10 +22,10 @@ const User = sequelize.define("user", {
   }
 });
 
-User.verifyPassword = function(password, cb) {
-  bcrypt.compare(password, this.password, function(err, isMatch) {
+User.verifyPassword = (password, cb) => {
+  bcrypt.compare(password, this.password, (err, isMatch) => {
     if (err) return cb(err);
-    cb(null, isMatch);
+    return cb(null, isMatch);
   });
 };
 
