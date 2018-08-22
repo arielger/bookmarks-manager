@@ -1,12 +1,12 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../../db");
-const User = require('../users').model;
+const User = require("../users").model;
 
 const Bookmark = sequelize.define("bookmark", {
-    url: {
-        type: Sequelize.STRING,
-        allowNull: false
-    }
+  url: {
+    type: Sequelize.STRING,
+    allowNull: false
+  }
 });
 
 Bookmark.belongsTo(User);

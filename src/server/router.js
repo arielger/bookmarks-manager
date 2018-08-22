@@ -1,7 +1,7 @@
 const bookmarkController = require("./components/bookmarks/controller");
 const tagController = require("./components/tags/controller");
-const userController = require('./components/users/controller');
-const verifyToken = require('./middleware/verifyToken');
+const userController = require("./components/users/controller");
+const verifyToken = require("./middleware/verifyToken");
 
 module.exports.set = app => {
   // Bookmarks
@@ -15,8 +15,8 @@ module.exports.set = app => {
   app.post("/tags", verifyToken, tagController.addTag);
 
   // Auth
-  app.post('/users/login', userController.logIn);
-  app.get('/users/me', verifyToken, userController.me);
-  app.post('/users/logout', userController.logOut);
-  app.post('/users/signup', userController.signUp);
+  app.post("/users/login", userController.logIn);
+  app.get("/users/me", verifyToken, userController.me);
+  app.post("/users/logout", userController.logOut);
+  app.post("/users/signup", userController.signUp);
 };

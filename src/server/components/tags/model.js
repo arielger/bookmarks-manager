@@ -1,13 +1,10 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../../db");
 const Bookmark = require("../bookmarks").model;
-const User = require('../users').model;
+const User = require("../users").model;
 
 const Tag = sequelize.define("tag", {
-    title: {
-        type: Sequelize.STRING,
-        allowNull: false
-    }
+  title: { type: Sequelize.STRING, allowNull: false }
 });
 
 Tag.belongsTo(User);

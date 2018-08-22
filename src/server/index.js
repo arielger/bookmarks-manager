@@ -3,7 +3,7 @@ const http = require("http");
 const bodyParser = require("body-parser");
 const config = require("./config");
 const router = require("./router");
-const dotenv = require('dotenv')
+const dotenv = require("dotenv");
 
 dotenv.config();
 
