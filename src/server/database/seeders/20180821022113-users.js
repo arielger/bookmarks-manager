@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
 const faker = require("faker");
 const R = require("ramda");
+const randomInt = require("random-int");
+const sampleSize = require("lodash.samplesize");
 /* eslint-disable no-console */
 
 const generateRandomUser = () => {
@@ -30,6 +32,13 @@ const generateRandomBookmark = userId => ({
   userId
 });
 
+const generateBookmarkTag = (bookmarkId, tagId) => ({
+  bookmarkId,
+  tagId,
+  createdAt: new Date(),
+  updatedAt: new Date()
+});
+
 module.exports = {
   up: async queryInterface => {
     const users = R.times(generateRandomUser, 5);
@@ -43,7 +52,7 @@ module.exports = {
       R.flatten
     )(dbUsers);
 
-    queryInterface.bulkInsert("tags", tags, {
+    const dbTags = await queryInterface.bulkInsert("tags", tags, {
       returning: true
     });
 
@@ -53,7 +62,26 @@ module.exports = {
       R.flatten
     )(dbUsers);
 
-    queryInterface.bulkInsert("bookmarks", bookmarks);
+    const dbBookmarks = await queryInterface.bulkInsert(
+      "bookmarks",
+      bookmarks,
+      { returning: true }
+    );
+
+    const bookmarkTags = R.chain(user => {
+      const bookmarksFromUser = dbBookmarks.filter(b => b.userId === user.id);
+      const tagsFromUser = dbTags.filter(t => t.userId === user.id);
+
+      // For each bookmark add from 0 to 5 tags
+      return R.chain(bookmark => {
+        const randomTagsSample = sampleSize(tagsFromUser, randomInt(5));
+        return randomTagsSample.map(tag =>
+          generateBookmarkTag(bookmark.id, tag.id)
+        );
+      }, bookmarksFromUser);
+    }, dbUsers);
+
+    await queryInterface.bulkInsert("BookmarkTag", bookmarkTags);
   },
 
   down: async queryInterface => {
@@ -65,5 +93,8 @@ module.exports = {
 
     console.log("🗑 Delete users");
     await queryInterface.bulkDelete("users", null, {});
+
+    console.log("🗑 Delete bookmark tags");
+    await queryInterface.bulkDelete("BookmarkTag", null, {});
   }
 };
