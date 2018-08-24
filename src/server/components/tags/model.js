@@ -4,7 +4,17 @@ const Bookmark = require("../bookmarks").model;
 const User = require("../users").model;
 
 const Tag = sequelize.define("tag", {
-  title: { type: Sequelize.STRING, allowNull: false }
+  id: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  title: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
+  createdAt: Sequelize.DATE,
+  updatedAt: Sequelize.DATE
 });
 
 Tag.belongsTo(User);

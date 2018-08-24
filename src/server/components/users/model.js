@@ -3,13 +3,20 @@ const Sequelize = require("sequelize");
 const sequelize = require("../../db");
 
 const User = sequelize.define("user", {
+  id: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
   firstName: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
+    validate: { isAlpha: true }
   },
   lastName: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
+    validate: { isAlpha: true }
   },
   username: {
     type: Sequelize.STRING,
@@ -19,7 +26,9 @@ const User = sequelize.define("user", {
   password: {
     type: Sequelize.STRING,
     allowNull: false
-  }
+  },
+  createdAt: Sequelize.DATE,
+  updatedAt: Sequelize.DATE
 });
 
 User.verifyPassword = (password, cb) => {
