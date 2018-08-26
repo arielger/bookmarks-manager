@@ -1,10 +1,10 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
-const config = require("./config");
-const router = require("./router");
 
 dotenv.config();
+
+const router = require("./router");
 
 const app = express();
 
@@ -16,7 +16,12 @@ app.use(
 );
 router.set(app);
 
-app.listen(config.port, () =>
+const port = process.env.PORT || 3000;
+
+app.listen(port, () =>
   // eslint-disable-next-line no-console
-  console.log(`App listening on port ${config.port} 👋`)
+  console.log(`App listening on port ${port} 👋`)
 );
+
+// for testing
+module.exports = app;
