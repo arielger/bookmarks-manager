@@ -9,7 +9,7 @@ const getRandomTagData = (userId, props = {}) => ({
   ...props
 });
 
-const createRandomTag = props => Tag.create(getRandomTagData(props));
+const createRandomTag = (...props) => Tag.create(getRandomTagData(...props));
 
 module.exports = {
   getRandomTagData,

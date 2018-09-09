@@ -50,8 +50,8 @@ describe("Bookmarks", () => {
 
     test("it should return a list of bookmarks", done => {
       Promise.all([
-        createRandomBookmark({ userId }),
-        createRandomBookmark({ userId })
+        createRandomBookmark(userId),
+        createRandomBookmark(userId)
       ]).then(() => {
         request(app)
           .get("/bookmarks")
@@ -68,9 +68,8 @@ describe("Bookmarks", () => {
 
   describe("/GET bookmark", () => {
     test("it should retrieve a bookmark data", done => {
-      createRandomBookmark({
-        url: "http://get-test.com/",
-        userId
+      createRandomBookmark(userId, {
+        url: "http://get-test.com/"
       }).then(bookmark => {
         request(app)
           .get(`/bookmarks/${bookmark.id}`)
@@ -85,7 +84,7 @@ describe("Bookmarks", () => {
     });
 
     test("it should not retrieve bookmarks from another user", done => {
-      createRandomBookmark({ userId: otherUserId }).then(bookmark => {
+      createRandomBookmark(otherUserId).then(bookmark => {
         request(app)
           .get(`/bookmarks/${bookmark.id}`)
           .set("x-access-token", token)
@@ -100,7 +99,7 @@ describe("Bookmarks", () => {
       request(app)
         .post("/bookmarks")
         .send(
-          getRandomBookmarkData({
+          getRandomBookmarkData(userId, {
             url: "http://bubble.example.com/"
           })
         )
@@ -116,9 +115,8 @@ describe("Bookmarks", () => {
 
   describe("/PUT bookmark", () => {
     test("it should update bookmark url", done => {
-      createRandomBookmark({
-        url: "http://test-put.example.com/",
-        userId
+      createRandomBookmark(userId, {
+        url: "http://test-put.example.com/"
       }).then(bookmark => {
         request(app)
           .put(`/bookmarks/${bookmark.id}`)
@@ -136,7 +134,7 @@ describe("Bookmarks", () => {
     });
 
     test("it should not be able to update bookmark from another user", done => {
-      createRandomBookmark({ userId: otherUserId }).then(bookmark => {
+      createRandomBookmark(otherUserId).then(bookmark => {
         request(app)
           .put(`/bookmarks/${bookmark.id}`)
           .send({ url: "http://changed.example.com/" })
@@ -149,9 +147,8 @@ describe("Bookmarks", () => {
 
   describe("/DELETE bookmark", () => {
     test("it should DELETE a bookmark by id", done => {
-      createRandomBookmark({
-        url: "http://test.example.com/",
-        userId
+      createRandomBookmark(userId, {
+        url: "http://test.example.com/"
       }).then(bookmark => {
         request(app)
           .delete(`/bookmarks/${bookmark.id}`)
