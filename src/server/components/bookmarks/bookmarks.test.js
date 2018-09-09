@@ -1,8 +1,5 @@
 const request = require("supertest");
-const jwt = require("jsonwebtoken");
 const app = require("../../app.js");
-const sequelize = require("../../db");
-const { getRandomUserData, createRandomUser } = require("../users").factory;
 const { getRandomBookmarkData, createRandomBookmark } = require("./").factory;
 
 let token;
@@ -10,33 +7,8 @@ let userId;
 let otherUserId;
 
 describe("Bookmarks", () => {
-  beforeAll(async () => {
-    await sequelize.sync({
-      force: true
-    });
-    console.log("💾 Database sync finished");
-
-    const randomUser = getRandomUserData({
-      username: "test"
-    });
-
-    // Create testing user and get JWT for testing
-    const response = await request(app)
-      .post("/users/signup")
-      .send(randomUser);
-
-    token = response.body.token; // eslint-disable-line prefer-destructuring
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-      userId = decoded.id;
-    });
-
-    createRandomUser({ username: "other" }).then(user => {
-      otherUserId = user.id;
-    });
-  });
-
-  afterAll(() => {
-    sequelize.close();
+  beforeAll(() => {
+    ({ token, userId, otherUserId } = global);
   });
 
   describe("/GET bookmarks", () => {

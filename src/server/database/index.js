@@ -1,12 +1,15 @@
 const Sequelize = require("sequelize");
+const config = require("./config");
+
+const envConfig = config.development;
 
 const sequelize = new Sequelize(
-  process.env.DB_DEVELOPMENT_DATABASE,
-  process.env.DB_DEVELOPMENT_USERNAME,
-  process.env.DB_DEVELOPMENT_PASSWORD,
+  envConfig.database,
+  envConfig.username,
+  envConfig.password,
   {
     dialect: "postgres",
-    host: process.env.DB_DEVELOPMENT_HOST,
+    host: envConfig.host,
     port: process.env.DB_DEVELOPMENT_PORT,
     logging: false
   }

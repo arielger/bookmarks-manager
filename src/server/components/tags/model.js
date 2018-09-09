@@ -1,5 +1,5 @@
 const Sequelize = require("sequelize");
-const sequelize = require("../../db");
+const sequelize = require("../../database");
 const Bookmark = require("../bookmarks").model;
 const User = require("../users").model;
 

@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const faker = require("faker");
 const User = require("./model");
 
-const getRandomUserData = ({ username, ...props }) => {
+const getRandomUserData = ({ username, ...props } = {}) => {
   // Use the same value for username and password for testing
 
   const user = username || faker.internet.userName();
