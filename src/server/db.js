@@ -13,7 +13,4 @@ const sequelize = new Sequelize(
 
 require("sequelize-values")(sequelize);
 
-// Force sync all models
-sequelize.sync({ force: true });
-
 module.exports = sequelize;

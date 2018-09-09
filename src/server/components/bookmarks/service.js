@@ -14,8 +14,16 @@ const add = (userId, bookmark) =>
     userId
   });
 
+const deleteFromUser = (userId, id) =>
+  Bookmarks.findById(id, { where: { userId } }).then(bookmark => {
+    if (!bookmark) return bookmark;
+    bookmark.destroy();
+    return bookmark;
+  });
+
 module.exports = {
   add,
   getAllFromUser,
-  getByIdFromUser
+  getByIdFromUser,
+  deleteFromUser
 };

@@ -1,36 +1,13 @@
-const bcrypt = require("bcrypt");
-const faker = require("faker");
 const R = require("ramda");
 const randomInt = require("random-int");
 const sampleSize = require("lodash.samplesize");
+
+// Factories
+const generateRandomUser = require("../../components/users").factory;
+const generateRandomTag = require("../../components/tags").factory;
+const generateRandomBookmark = require("../../components/bookmarks").factory;
+
 /* eslint-disable no-console */
-
-const generateRandomUser = () => {
-  const username = faker.internet.userName();
-
-  return {
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName(),
-    username,
-    password: bcrypt.hashSync(username, 8),
-    createdAt: new Date(),
-    updatedAt: new Date()
-  };
-};
-
-const generateRandomTag = userId => ({
-  title: faker.random.word(),
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  userId
-});
-
-const generateRandomBookmark = userId => ({
-  url: faker.internet.url(),
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  userId
-});
 
 const generateBookmarkTag = (bookmarkId, tagId) => ({
   bookmarkId,

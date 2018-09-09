@@ -6,8 +6,10 @@ const verifyToken = require("./middleware/verifyToken");
 module.exports.set = app => {
   // Bookmarks
   app.get("/bookmarks", verifyToken, bookmarkController.getBookmarks);
-  app.get("/bookmarks/:id", verifyToken, bookmarkController.getBookmark);
   app.post("/bookmarks", verifyToken, bookmarkController.addBookmark);
+
+  app.get("/bookmarks/:id", verifyToken, bookmarkController.getBookmark);
+  app.delete("/bookmarks/:id", verifyToken, bookmarkController.deleteBookmark);
 
   // Tags
   app.get("/tags", verifyToken, tagController.getTags);
