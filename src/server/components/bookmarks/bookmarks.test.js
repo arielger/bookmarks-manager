@@ -114,6 +114,39 @@ describe("Bookmarks", () => {
     });
   });
 
+  describe("/PUT bookmark", () => {
+    test("it should update bookmark url", done => {
+      createRandomBookmark({
+        url: "http://test-put.example.com/",
+        userId
+      }).then(bookmark => {
+        request(app)
+          .put(`/bookmarks/${bookmark.id}`)
+          .send({ url: "http://changed.example.com/" })
+          .set("x-access-token", token)
+          .expect(200)
+          .expect(res => {
+            expect(res.body).toHaveProperty(
+              "url",
+              "http://changed.example.com/"
+            );
+          })
+          .end(done);
+      });
+    });
+
+    test("it should not be able to update bookmark from another user", done => {
+      createRandomBookmark({ userId: otherUserId }).then(bookmark => {
+        request(app)
+          .put(`/bookmarks/${bookmark.id}`)
+          .send({ url: "http://changed.example.com/" })
+          .set("x-access-token", token)
+          .expect(404)
+          .end(done);
+      });
+    });
+  });
+
   describe("/DELETE bookmark", () => {
     test("it should DELETE a bookmark by id", done => {
       createRandomBookmark({

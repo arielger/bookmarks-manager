@@ -14,17 +14,38 @@ const getBookmark = (req, res) => {
     .getByIdFromUser(req.userId, bookmarkId)
     .then(bookmark => {
       if (!bookmark) {
-        return res.status(404).send("Bookmark not found for the user");
+        return res
+          .status(404)
+          .send({ error: "Bookmark not found for the user" });
       }
       return res.status(200).send(bookmark);
     })
-    .catch(err => res.status(500).send(err));
+    .catch(err => res.status(500).send({ error: err }));
 };
 
 const addBookmark = (req, res) => {
   bookmarkService
     .add(req.userId, { url: req.body.url })
     .then(data => res.send(data));
+};
+
+const updateBookmark = (req, res) => {
+  const bookmarkId = req.params.id;
+  const updatedData = {
+    url: req.body.url
+  };
+
+  bookmarkService
+    .updateByIdFromUser(req.userId, bookmarkId, updatedData)
+    .then(bookmark => {
+      if (!bookmark) {
+        return res
+          .status(404)
+          .send({ error: "Bookmark not found for the user" });
+      }
+      return res.status(200).send(bookmark);
+    })
+    .catch(err => res.status(500).send({ error: err }));
 };
 
 const deleteBookmark = (req, res) => {
@@ -34,16 +55,19 @@ const deleteBookmark = (req, res) => {
     .deleteFromUser(req.userId, bookmarkId)
     .then(bookmark => {
       if (!bookmark) {
-        return res.status(404).send("Bookmark not found for the user");
+        return res
+          .status(404)
+          .send({ error: "Bookmark not found for the user" });
       }
       return res.status(200).send(bookmark);
     })
-    .catch(err => res.status(500).send(err));
+    .catch(err => res.status(500).send({ error: err }));
 };
 
 module.exports = {
   getBookmarks,
   getBookmark,
   addBookmark,
+  updateBookmark,
   deleteBookmark
 };

@@ -8,6 +8,7 @@ module.exports.set = app => {
   app.get("/bookmarks", verifyToken, bookmarkController.getBookmarks);
   app.post("/bookmarks", verifyToken, bookmarkController.addBookmark);
 
+  app.put("/bookmarks/:id", verifyToken, bookmarkController.updateBookmark);
   app.get("/bookmarks/:id", verifyToken, bookmarkController.getBookmark);
   app.delete("/bookmarks/:id", verifyToken, bookmarkController.deleteBookmark);
 
