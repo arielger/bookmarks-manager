@@ -6,7 +6,7 @@ const getAllFromUser = userId =>
   });
 
 const getByIdFromUser = (userId, id) =>
-  Bookmarks.findById(id, { where: { userId } });
+  Bookmarks.findOne({ where: { id, userId } });
 
 const add = (userId, bookmark) =>
   Bookmarks.create({

@@ -2,11 +2,12 @@ const request = require("supertest");
 const jwt = require("jsonwebtoken");
 const app = require("../../app.js");
 const sequelize = require("../../db");
-const { getRandomUserData } = require("../users").factory;
+const { getRandomUserData, createRandomUser } = require("../users").factory;
 const { getRandomBookmarkData, createRandomBookmark } = require("./").factory;
 
 let token;
 let userId;
+let otherUserId;
 
 describe("Bookmarks", () => {
   beforeAll(async () => {
@@ -27,6 +28,10 @@ describe("Bookmarks", () => {
     token = response.body.token; // eslint-disable-line prefer-destructuring
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       userId = decoded.id;
+    });
+
+    createRandomUser({ username: "other" }).then(user => {
+      otherUserId = user.id;
     });
   });
 
@@ -61,6 +66,35 @@ describe("Bookmarks", () => {
     });
   });
 
+  describe("/GET bookmark", () => {
+    test("it should retrieve a bookmark data", done => {
+      createRandomBookmark({
+        url: "http://get-test.com/",
+        userId
+      }).then(bookmark => {
+        request(app)
+          .get(`/bookmarks/${bookmark.id}`)
+          .set("x-access-token", token)
+          .expect("Content-Type", /json/)
+          .expect(200)
+          .expect(res => {
+            expect(res.body).toHaveProperty("url", "http://get-test.com/");
+          })
+          .end(done);
+      });
+    });
+
+    test("it should not retrieve bookmarks from another user", done => {
+      createRandomBookmark({ userId: otherUserId }).then(bookmark => {
+        request(app)
+          .get(`/bookmarks/${bookmark.id}`)
+          .set("x-access-token", token)
+          .expect(404)
+          .end(done);
+      });
+    });
+  });
+
   describe("/POST bookmarks", () => {
     test("it should create a new bookmark and retrieve it", done => {
       request(app)
@@ -80,7 +114,7 @@ describe("Bookmarks", () => {
     });
   });
 
-  describe("/DELETE bookmarks", () => {
+  describe("/DELETE bookmark", () => {
     test("it should DELETE a bookmark by id", done => {
       createRandomBookmark({
         url: "http://test.example.com/",
