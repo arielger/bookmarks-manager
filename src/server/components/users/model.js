@@ -2,6 +2,8 @@ const bcrypt = require("bcrypt");
 const Sequelize = require("sequelize");
 const sequelize = require("../../database");
 
+// @todo: Add email to user modal, review firstName and lastName attributes
+
 const User = sequelize.define("user", {
   id: {
     type: Sequelize.INTEGER,
