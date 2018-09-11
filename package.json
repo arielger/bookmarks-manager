@@ -27,7 +27,7 @@
       "prettier --write",
       "git add"
     ],
-    "*.{js,jsx}": "eslint"
+    "src/**/*.{js,jsx}": "eslint"
   },
   "dependencies": {
     "bcrypt": "^3.0.0",

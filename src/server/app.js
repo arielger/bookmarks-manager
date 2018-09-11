@@ -24,7 +24,7 @@ router.set(app);
 
 // Prevent bounding server to port in test env
 if (process.env.NODE_ENV !== "test") {
-  const port = process.env.PORT || 3000;
+  const port = process.env.SERVER_PORT || 5000;
 
   app.listen(port, () =>
     // eslint-disable-next-line no-console
