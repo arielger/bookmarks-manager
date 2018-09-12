@@ -37,25 +37,23 @@ class SignUp extends Component {
         <h1>Sign up</h1>
         <Form onSubmit={this.handleSubmit} layout="vertical">
           <Form.Item>
-            {getFieldDecorator("firstName", {
-              rules: [
-                { required: true, message: "Please input your first name" }
-              ]
-            })(
-              <Input prefix={<Icon type="user" />} placeholder="First name" />
-            )}
-          </Form.Item>
-          <Form.Item>
-            {getFieldDecorator("lastName", {
-              rules: [
-                { required: true, message: "Please input your last name" }
-              ]
-            })(<Input prefix={<Icon type="user" />} placeholder="Last name" />)}
-          </Form.Item>
-          <Form.Item>
             {getFieldDecorator("username", {
               rules: [{ required: true, message: "Please input your username" }]
-            })(<Input prefix={<Icon type="user" />} placeholder="Username" />)}
+            })(<Input prefix={<Icon type="smile" />} placeholder="Username" />)}
+          </Form.Item>
+          <Form.Item>
+            {getFieldDecorator("email", {
+              rules: [
+                {
+                  type: "email",
+                  message: "The input is not a valid email!"
+                },
+                {
+                  required: true,
+                  message: "Please input your email"
+                }
+              ]
+            })(<Input prefix={<Icon type="mail" />} placeholder="Email" />)}
           </Form.Item>
           <Form.Item>
             {getFieldDecorator("password", {

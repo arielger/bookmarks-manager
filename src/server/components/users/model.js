@@ -2,8 +2,6 @@ const bcrypt = require("bcrypt");
 const Sequelize = require("sequelize");
 const sequelize = require("../../database");
 
-// @todo: Add email to user modal, review firstName and lastName attributes
-
 const User = sequelize.define("user", {
   id: {
     type: Sequelize.INTEGER,
@@ -12,12 +10,12 @@ const User = sequelize.define("user", {
   },
   firstName: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
     validate: { isAlpha: true }
   },
   lastName: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
     validate: { isAlpha: true }
   },
   username: {
@@ -25,9 +23,22 @@ const User = sequelize.define("user", {
     unique: true,
     allowNull: false
   },
+  email: {
+    type: Sequelize.STRING,
+    unique: true,
+    allowNull: false,
+    validate: { isEmail: true }
+  },
   password: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
+    // @todo: Review length validation -> not working
+    validate: {
+      len: {
+        args: [6, 128],
+        msg: "The password should have at least 6 characters."
+      }
+    }
   },
   createdAt: Sequelize.DATE,
   updatedAt: Sequelize.DATE

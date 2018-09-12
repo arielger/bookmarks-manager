@@ -11,7 +11,7 @@ class App extends Component {
         <Route path="/signup" component={SignUp} />
         <Route path="/login" component={LogIn} />
         {/* @todo: Authenticate bookmarks route */}
-        <Route path="/" component={BookmarksList} />
+        <Route path="/" exact component={BookmarksList} />
       </div>
     );
   }

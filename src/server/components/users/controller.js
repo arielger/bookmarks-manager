@@ -1,29 +1,39 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const Joi = require("joi");
+const sequelizeToJoi = require("@revolttv/sequelize-to-joi").default;
+const R = require("ramda");
 const User = require("./model");
 const userService = require("./service");
 
+const userValidator = sequelizeToJoi(User);
+
 const signUp = (req, res) => {
-  const { firstName, lastName, username, password } = req.body;
+  const userData = R.pick(
+    ["firstName", "lastName", "username", "password", "email"],
+    req.body
+  );
 
-  const hashedPassword = bcrypt.hashSync(password, 8);
+  const validationResult = Joi.validate(userData, userValidator);
 
-  userService
-    .add({
-      firstName,
-      lastName,
-      username,
-      password: hashedPassword
-    })
+  if (validationResult.error) {
+    return res.status(400).send({
+      error: validationResult.error.details
+        .map(detail => detail.message)
+        .join(" / ")
+    });
+  }
+
+  const hashedPassword = bcrypt.hashSync(userData.password, 8);
+
+  return userService
+    .add({ ...userData, password: hashedPassword })
     .then(user => {
       const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
         expiresIn: "24h"
       });
 
-      return res.status(200).send({
-        auth: true,
-        token
-      });
+      return res.status(200).send({ auth: true, token });
     })
     .catch(err => res.status(500).send(err));
 };

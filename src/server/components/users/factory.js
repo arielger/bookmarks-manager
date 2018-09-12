@@ -11,6 +11,7 @@ const getRandomUserData = ({ username, ...props } = {}) => {
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
     username: user,
+    email: faker.internet.email(),
     password: bcrypt.hashSync(user, 8),
     createdAt: new Date(),
     updatedAt: new Date(),
