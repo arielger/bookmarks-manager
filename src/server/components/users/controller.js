@@ -8,9 +8,10 @@ const userService = require("./service");
 
 const userValidator = sequelizeToJoi(User);
 
-const signUp = (req, res) => {
+// @todo: Review error results
+const signUp = async (req, res) => {
   const userData = R.pick(
-    ["firstName", "lastName", "username", "password", "email"],
+    ["firstName", "lastName", "password", "email"],
     req.body
   );
 
@@ -21,6 +22,22 @@ const signUp = (req, res) => {
       error: validationResult.error.details
         .map(detail => detail.message)
         .join(" / ")
+    });
+  }
+
+  if (userData.password.length < 6 || userData.password.length > 128) {
+    return res.status(400).send({
+      error: "The password should have at least 6 characters"
+    });
+  }
+
+  const userWithSameEmail = await User.findOne({
+    where: { email: userData.email }
+  });
+
+  if (userWithSameEmail) {
+    return res.status(400).send({
+      error: "There is already an user with that email"
     });
   }
 
@@ -43,7 +60,10 @@ const me = (req, res) => {
     attributes: { exclude: ["password"] }
   })
     .then(user => {
-      if (!user) return res.status(404).send("User not found");
+      if (!user)
+        return res.status(404).send({
+          error: "User not found"
+        });
       return res.status(200).send(user);
     })
     .catch(err =>
@@ -52,13 +72,16 @@ const me = (req, res) => {
 };
 
 const logIn = (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  // Check if user with the username exists
+  // Check if user with the email exists
 
-  User.findOne({ where: { username } })
+  User.findOne({ where: { email } })
     .then(user => {
-      if (!user) return res.status(404).send("User not found");
+      if (!user)
+        return res.status(404).send({
+          error: "User not found"
+        });
 
       // If exists check if the password match
 

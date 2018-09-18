@@ -2,17 +2,15 @@ const bcrypt = require("bcrypt");
 const faker = require("faker");
 const User = require("./model");
 
-const getRandomUserData = ({ username, ...props } = {}) => {
-  // Use the same value for username and password for testing
-
-  const user = username || faker.internet.userName();
+const getRandomUserData = ({ email, ...props } = {}) => {
+  // Use the same value for email and password for testing
+  const newEmail = email || faker.internet.email();
 
   return {
     firstName: faker.name.firstName(),
     lastName: faker.name.lastName(),
-    username: user,
-    email: faker.internet.email(),
-    password: bcrypt.hashSync(user, 8),
+    email: newEmail,
+    password: bcrypt.hashSync(newEmail, 8),
     createdAt: new Date(),
     updatedAt: new Date(),
     ...props

@@ -18,11 +18,6 @@ const User = sequelize.define("user", {
     allowNull: true,
     validate: { isAlpha: true }
   },
-  username: {
-    type: Sequelize.STRING,
-    unique: true,
-    allowNull: false
-  },
   email: {
     type: Sequelize.STRING,
     unique: true,
@@ -31,14 +26,7 @@ const User = sequelize.define("user", {
   },
   password: {
     type: Sequelize.STRING,
-    allowNull: false,
-    // @todo: Review length validation -> not working
-    validate: {
-      len: {
-        args: [6, 128],
-        msg: "The password should have at least 6 characters."
-      }
-    }
+    allowNull: false
   },
   createdAt: Sequelize.DATE,
   updatedAt: Sequelize.DATE
