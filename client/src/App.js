@@ -60,7 +60,7 @@ class App extends Component {
             shouldRender={isAuthenticated}
             redirect="/login"
             exact
-            component={BookmarksList}
+            render={() => <BookmarksList userToken={this.state.userToken} />}
           />
         </Switch>
       </div>

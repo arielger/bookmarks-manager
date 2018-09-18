@@ -25,7 +25,11 @@ const getBookmark = (req, res) => {
 
 const addBookmark = (req, res) => {
   bookmarkService
-    .add(req.userId, { url: req.body.url })
+    .add(req.userId, {
+      url: req.body.url,
+      title: req.body.title,
+      description: req.body.description
+    })
     .then(data => res.send(data));
 };
 
