@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
 import axios from "axios";
-import SignUp from "./account/SignUp";
-import LogIn from "./account/LogIn";
-import BookmarksList from "./bookmarks/BookmarksList";
+import { SignUp, LogIn, Bookmarks } from "./scenes";
 
 class App extends Component {
   constructor() {
@@ -48,7 +46,7 @@ class App extends Component {
             path="/"
             exact
             render={() => (
-              <BookmarksList
+              <Bookmarks
                 logout={this.logout}
                 userToken={this.state.userToken}
               />
