@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { List, Avatar, Button } from "antd";
 import styled from "styled-components";
-import NewBookmark from "./NewBookmark";
+import humanizeUrl from "humanize-url";
+import BookmarkForm from "./BookmarkForm";
 import Sidebar from "./Sidebar";
 import { bookmarks as bookmarksApi } from "../../api";
 
@@ -19,6 +20,10 @@ const ListWrapper = styled.div`
 
   .bookmarks-list {
     width: 100%;
+  }
+
+  .avatar {
+    border: 1px solid rgba(0, 0, 0, 0.1);
   }
 `;
 
@@ -80,16 +85,17 @@ export default class Bookmarks extends Component {
                       size="large"
                       icon="link"
                       src={`https://logo-core.clearbit.com/${bookmark.url}`}
+                      className="avatar"
                     />
                   }
                   title={bookmark.title}
-                  description={bookmark.url}
+                  description={humanizeUrl(bookmark.url)}
                 />
               </List.Item>
             )}
           />
         </ListWrapper>
-        <NewBookmark
+        <BookmarkForm
           visible={this.state.isNewBookmarkModalOpen}
           closeModal={this.hideNewBookmarkModal}
         />

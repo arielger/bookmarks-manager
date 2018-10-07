@@ -59,10 +59,6 @@ export class NewBookmark extends Component {
                 {
                   required: true,
                   message: "Please input an URL"
-                },
-                {
-                  type: "url",
-                  message: "Please input a valid URL"
                 }
               ]
             })(
