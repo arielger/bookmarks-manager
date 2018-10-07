@@ -1,17 +1,28 @@
 import React, { Component } from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
+import axios from "axios";
 import SignUp from "./account/SignUp";
 import LogIn from "./account/LogIn";
 import BookmarksList from "./bookmarks/BookmarksList";
 
 class App extends Component {
-  state = {
-    userToken: sessionStorage.getItem("jwtToken") || ""
-  };
+  constructor() {
+    super();
+    const userToken = sessionStorage.getItem("jwtToken") || "";
+    this.state = { userToken };
+    axios.defaults.headers.common["x-access-token"] = userToken;
+  }
 
   setUserToken = userToken => {
     sessionStorage.setItem("jwtToken", userToken);
     this.setState({ userToken });
+    axios.defaults.headers.common["x-access-token"] = userToken;
+  };
+
+  logout = () => {
+    sessionStorage.removeItem("jwtToken");
+    this.setState({ userToken: "" });
+    axios.defaults.headers.common["x-access-token"] = "";
   };
 
   render() {
@@ -36,7 +47,12 @@ class App extends Component {
           <Route
             path="/"
             exact
-            render={() => <BookmarksList userToken={this.state.userToken} />}
+            render={() => (
+              <BookmarksList
+                logout={this.logout}
+                userToken={this.state.userToken}
+              />
+            )}
           />
           <Redirect to="/" />
         </Switch>

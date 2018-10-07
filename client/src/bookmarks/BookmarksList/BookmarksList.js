@@ -1,15 +1,14 @@
 import React, { Component } from "react";
-import { List } from "antd";
+import PropTypes from "prop-types";
+import { List, Button } from "antd";
 import CreateBookmark from "../CreateBookmark";
-
-function handleErrors(response) {
-  if (!response.ok) {
-    throw Error(response.statusText);
-  }
-  return response;
-}
+import { bookmarks as bookmarksApi } from "../../api";
 
 export default class BookmarksList extends Component {
+  static propTypes = {
+    logout: PropTypes.func.isRequired
+  };
+
   state = {
     bookmarks: [],
     isFetching: false
@@ -18,17 +17,10 @@ export default class BookmarksList extends Component {
   componentDidMount() {
     this.setState({ isFetching: true });
 
-    fetch("/bookmarks", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "x-access-token": this.props.userToken
-      }
-    })
-      .then(handleErrors)
-      .then(res => res.json())
-      .then(res => {
-        this.setState({ isFetching: false, bookmarks: res });
+    bookmarksApi
+      .getAll(this.props.userToken)
+      .then(({ data }) => {
+        this.setState({ isFetching: false, bookmarks: data });
       })
       .catch(error => {
         console.error("Error:", error);
@@ -39,6 +31,7 @@ export default class BookmarksList extends Component {
   render() {
     return (
       <div>
+        <Button onClick={this.props.logout}>Log out</Button>
         <h1>Bookmarks</h1>
         <List
           dataSource={this.state.bookmarks}

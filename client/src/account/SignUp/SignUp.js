@@ -3,20 +3,12 @@ import PropTypes from "prop-types";
 import { Form, Icon, Input, Button, Alert } from "antd";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { users as usersApi } from "../../api";
 
 const FormWrapper = styled.div`
   max-width: 320px;
   margin: 60px auto 0;
 `;
-
-// @todo: Review handle errors logic
-// @todo: Add api file
-function handleErrors(response) {
-  if (!response.ok) {
-    throw Error(response.statusText);
-  }
-  return response;
-}
 
 class SignUp extends Component {
   static propTypes = {
@@ -24,31 +16,22 @@ class SignUp extends Component {
   };
 
   state = {
-    error: "",
-    redirectToHomepage: false
+    error: ""
   };
 
   handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        console.log("Sign up with values:", values);
-
-        fetch("/users/signup", {
-          method: "POST",
-          body: JSON.stringify(values),
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
-          .then(handleErrors)
-          .then(res => res.json())
-          .then(res => {
-            this.props.setUserToken(res.token);
+        usersApi
+          .signup(values)
+          .then(({ data: { token } }) => {
+            this.props.setUserToken(token);
           })
           .catch(error => {
-            console.error("Error:", error);
-            this.setState({ error });
+            this.setState({
+              error: "There was an error creating your account."
+            });
           });
       }
     });

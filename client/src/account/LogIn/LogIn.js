@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Redirect } from "react-router-dom";
 import { Form, Icon, Input, Button } from "antd";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { users as usersApi } from "../../api";
 
 const FormWrapper = styled.div`
   max-width: 320px;
@@ -15,39 +15,22 @@ class LogIn extends Component {
     setUserToken: PropTypes.func.isRequired
   };
 
-  state = {
-    redirectToHomepage: false
-  };
-
   handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        console.log("Sign up with values:", values);
-
-        fetch("/users/login", {
-          method: "POST",
-          body: JSON.stringify(values),
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
-          .then(res => res.json())
-          .catch(error => console.error("Error:", error))
-          .then(response => {
-            this.props.setUserToken(response.token);
-            this.setState({ redirectToHomepage: true });
-          });
+        usersApi
+          .login(values)
+          .then(({ data: { token } }) => {
+            this.props.setUserToken(token);
+          })
+          .catch(error => console.error("Error:", error));
       }
     });
   };
 
   render() {
     const { getFieldDecorator } = this.props.form;
-
-    if (this.state.redirectToHomepage) {
-      return <Redirect to="/" />;
-    }
 
     return (
       <FormWrapper>

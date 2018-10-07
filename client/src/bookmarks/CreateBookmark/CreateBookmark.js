@@ -1,38 +1,22 @@
 import React, { Component } from "react";
 import { Form, Icon, Input, Button } from "antd";
 import styled from "styled-components";
+import { bookmarks as bookmarksApi } from "../../api";
 
 const FormWrapper = styled.div`
   max-width: 320px;
   margin: 60px auto 0;
 `;
 
-function handleErrors(response) {
-  if (!response.ok) {
-    throw Error(response.statusText);
-  }
-  return response;
-}
-
 export class CreateBookmark extends Component {
   handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        console.log("Create bookmark with values:", values);
-
-        fetch("/bookmarks", {
-          method: "POST",
-          body: JSON.stringify(values),
-          headers: {
-            "Content-Type": "application/json",
-            "x-access-token": this.props.userToken
-          }
-        })
-          .then(handleErrors)
-          .then(res => res.json())
-          .then(res => {
-            console.log("res", res);
+        bookmarksApi
+          .create(values)
+          .then(({ data }) => {
+            console.log("📌 Created bookmark", data);
           })
           .catch(error => {
             console.error("Error:", error);
