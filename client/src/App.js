@@ -1,26 +1,20 @@
 import React, { Component } from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
-import axios from "axios";
 import { SignUp, LogIn, Bookmarks } from "./scenes";
 
 class App extends Component {
-  constructor() {
-    super();
-    const userToken = sessionStorage.getItem("jwtToken") || "";
-    this.state = { userToken };
-    axios.defaults.headers.common["x-access-token"] = userToken;
-  }
+  state = {
+    userToken: sessionStorage.getItem("jwtToken") || ""
+  };
 
   setUserToken = userToken => {
     sessionStorage.setItem("jwtToken", userToken);
     this.setState({ userToken });
-    axios.defaults.headers.common["x-access-token"] = userToken;
   };
 
   logout = () => {
     sessionStorage.removeItem("jwtToken");
     this.setState({ userToken: "" });
-    axios.defaults.headers.common["x-access-token"] = "";
   };
 
   render() {
