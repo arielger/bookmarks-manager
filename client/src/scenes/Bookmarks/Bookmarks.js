@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { List, Avatar, Button } from "antd";
+import { List, Avatar, Button, message } from "antd";
 import styled from "styled-components";
 import humanizeUrl from "humanize-url";
 import BookmarkForm from "./BookmarkForm";
@@ -76,9 +76,23 @@ export default class Bookmarks extends Component {
       })
       .catch(error => {
         console.error("Error:", error);
-        this.setState({ error });
       });
   }
+
+  deleteBookmark = bookmarkId => {
+    this.setState(prevState => ({
+      ...prevState,
+      bookmarks: prevState.bookmarks.filter(b => b.id !== bookmarkId)
+    }));
+    bookmarksApi
+      .delete(bookmarkId)
+      .then(({ data }) => {
+        console.log("Deleted bookmark:", data);
+      })
+      .catch(error => {
+        console.log("Error:", error);
+      });
+  };
 
   render() {
     const { logout } = this.props;
@@ -106,7 +120,13 @@ export default class Bookmarks extends Component {
                       this.showBookmarkModal(bookmark.id);
                     }}
                   />,
-                  <Button icon="delete" type="danger" />
+                  <Button
+                    icon="delete"
+                    type="danger"
+                    onClick={() => {
+                      this.deleteBookmark(bookmark.id);
+                    }}
+                  />
                 ]}
               >
                 <List.Item.Meta
