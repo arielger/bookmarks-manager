@@ -17,5 +17,7 @@ export const users = {
 
 export const bookmarks = {
   getAll: () => axios.get("/bookmarks"),
-  create: bookmark => axios.post("/bookmarks", bookmark)
+  create: bookmark => axios.post("/bookmarks", bookmark),
+  update: (bookmark, bookmarkId) =>
+    axios.put(`/bookmarks/${bookmarkId}`, bookmark)
 };

@@ -36,7 +36,9 @@ const addBookmark = (req, res) => {
 const updateBookmark = (req, res) => {
   const bookmarkId = req.params.id;
   const updatedData = {
-    url: req.body.url
+    url: req.body.url,
+    title: req.body.title,
+    description: req.body.description
   };
 
   bookmarkService

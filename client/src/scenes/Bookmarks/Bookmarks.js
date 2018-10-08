@@ -35,15 +35,35 @@ export default class Bookmarks extends Component {
   state = {
     bookmarks: [],
     isFetching: false,
-    isNewBookmarkModalOpen: false
+    isBookmarkModalOpen: false,
+    modalBookmarkId: undefined
   };
 
-  showNewBookmarkModal = () => {
-    this.setState({ isNewBookmarkModalOpen: true });
+  addBookmark = bookmark => {
+    this.setState(prevState => ({
+      ...prevState,
+      bookmarks: prevState.bookmarks.concat(bookmark)
+    }));
+  };
+
+  editBookmark = bookmark => {
+    this.setState(prevState => ({
+      ...prevState,
+      bookmarks: prevState.bookmarks.map(
+        b => (b.id === bookmark.id ? bookmark : b)
+      )
+    }));
+  };
+
+  showBookmarkModal = bookmarkId => {
+    this.setState({
+      isBookmarkModalOpen: true,
+      modalBookmarkId: bookmarkId
+    });
   };
 
   hideNewBookmarkModal = () => {
-    this.setState({ isNewBookmarkModalOpen: false });
+    this.setState({ isBookmarkModalOpen: false });
   };
 
   componentDidMount() {
@@ -62,19 +82,30 @@ export default class Bookmarks extends Component {
 
   render() {
     const { logout } = this.props;
+    const { bookmarks, modalBookmarkId } = this.state;
 
     return (
       <Wrapper>
-        <Sidebar showAddBookmark={this.showNewBookmarkModal} logout={logout} />
+        <Sidebar
+          showAddBookmark={() => {
+            this.showBookmarkModal();
+          }}
+          logout={logout}
+        />
         <ListWrapper>
           <List
             className="bookmarks-list"
             itemLayout="horizontal"
-            dataSource={this.state.bookmarks}
+            dataSource={bookmarks}
             renderItem={bookmark => (
               <List.Item
                 actions={[
-                  <Button icon="edit" />,
+                  <Button
+                    icon="edit"
+                    onClick={() => {
+                      this.showBookmarkModal(bookmark.id);
+                    }}
+                  />,
                   <Button icon="delete" type="danger" />
                 ]}
               >
@@ -96,7 +127,12 @@ export default class Bookmarks extends Component {
           />
         </ListWrapper>
         <BookmarkForm
-          visible={this.state.isNewBookmarkModalOpen}
+          isNew={!modalBookmarkId}
+          bookmarkData={
+            modalBookmarkId ? bookmarks.find(b => b.id === modalBookmarkId) : {}
+          }
+          handleSubmit={modalBookmarkId ? this.editBookmark : this.addBookmark}
+          visible={this.state.isBookmarkModalOpen}
           closeModal={this.hideNewBookmarkModal}
         />
       </Wrapper>
