@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Form, Icon, Input, Button, Alert } from "antd";
+import { Form, Icon, Input, Button, message } from "antd";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { users as usersApi } from "../../api";
@@ -10,13 +10,14 @@ const FormWrapper = styled.div`
   margin: 60px auto 0;
 `;
 
+const LinksContainer = styled.div`
+  margin-top: 16px;
+  text-align: center;
+`;
+
 class SignUp extends Component {
   static propTypes = {
     setUserToken: PropTypes.func.isRequired
-  };
-
-  state = {
-    error: ""
   };
 
   handleSubmit = e => {
@@ -28,10 +29,29 @@ class SignUp extends Component {
           .then(({ data: { token } }) => {
             this.props.setUserToken(token);
           })
+          // @todo: Refactor axios error handling
           .catch(error => {
-            this.setState({
-              error: "There was an error creating your account."
-            });
+            if (error.response) {
+              const errorData = error.response.data.error;
+              this.props.form.setFields({
+                email: {
+                  value: this.props.form.getFieldValue("email"),
+                  errors: errorData.details.email && [
+                    new Error(errorData.details.email.message)
+                  ]
+                },
+                password: {
+                  value: "",
+                  errors: errorData.details.password && [
+                    new Error(errorData.details.password.message)
+                  ]
+                }
+              });
+            } else {
+              message.error(
+                "There was an error trying to create your account."
+              );
+            }
           });
       }
     });
@@ -39,7 +59,6 @@ class SignUp extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { error } = this.state;
 
     return (
       <FormWrapper>
@@ -88,15 +107,13 @@ class SignUp extends Component {
               />
             )}
           </Form.Item>
-          {error && <Alert message={error} type="error" />}
           <Form.Item>
             <Button type="primary" htmlType="submit" size="large" block>
               Register
             </Button>
-            <br />
-            <p>
-              Or <Link to="/login">Log In</Link>
-            </p>
+            <LinksContainer>
+              <Link to="/login">Log In ›</Link>
+            </LinksContainer>
           </Form.Item>
         </Form>
       </FormWrapper>

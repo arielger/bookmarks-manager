@@ -6,9 +6,16 @@ const R = require("ramda");
 const User = require("./model");
 const userService = require("./service");
 
-const userValidator = sequelizeToJoi(User);
+const userValidator = sequelizeToJoi(User)
+  // Need to validate the password outside of the model since
+  // the password of the model is hashed
+  .keys({
+    password: Joi.string()
+      .required()
+      .min(6)
+      .max(128)
+  });
 
-// @todo: Review error results
 const signUp = async (req, res) => {
   const userData = R.pick(
     ["firstName", "lastName", "password", "email"],
@@ -18,16 +25,21 @@ const signUp = async (req, res) => {
   const validationResult = Joi.validate(userData, userValidator);
 
   if (validationResult.error) {
+    const error = {
+      original: validationResult.error._object, // eslint-disable-line no-underscore-dangle
+      details: R.fromPairs(
+        validationResult.error.details.map(({ message, type, path }) => [
+          path,
+          {
+            message: message.replace(/['"]/g, ""),
+            type
+          }
+        ])
+      )
+    };
     return res.status(400).send({
-      error: validationResult.error.details
-        .map(detail => detail.message)
-        .join(" / ")
-    });
-  }
-
-  if (userData.password.length < 6 || userData.password.length > 128) {
-    return res.status(400).send({
-      error: "The password should have at least 6 characters"
+      status: "failed",
+      error
     });
   }
 
@@ -37,7 +49,15 @@ const signUp = async (req, res) => {
 
   if (userWithSameEmail) {
     return res.status(400).send({
-      error: "There is already an user with that email"
+      status: "failed",
+      error: {
+        original: userData,
+        details: {
+          email: {
+            message: "There is already an user with that email"
+          }
+        }
+      }
     });
   }
 
