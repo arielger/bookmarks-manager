@@ -22,24 +22,24 @@ const signUp = async (req, res) => {
     req.body
   );
 
+  // @todo: Move joi validation to middleware
   const validationResult = Joi.validate(userData, userValidator);
 
   if (validationResult.error) {
-    const error = {
-      original: validationResult.error._object, // eslint-disable-line no-underscore-dangle
-      details: R.fromPairs(
-        validationResult.error.details.map(({ message, type, path }) => [
-          path,
-          {
-            message: message.replace(/['"]/g, ""),
-            type
-          }
-        ])
-      )
-    };
     return res.status(400).send({
       status: "failed",
-      error
+      error: {
+        original: validationResult.error._object, // eslint-disable-line no-underscore-dangle
+        details: R.fromPairs(
+          validationResult.error.details.map(({ message, type, path }) => [
+            path,
+            {
+              message: message.replace(/['"]/g, ""),
+              type
+            }
+          ])
+        )
+      }
     });
   }
 

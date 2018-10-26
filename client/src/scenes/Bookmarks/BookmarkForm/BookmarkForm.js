@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Form, Icon, Input, Modal } from "antd";
+import validator from "validator";
+import normalizeUrl from "normalize-url";
 import { bookmarks as bookmarksApi } from "../../../api";
 
 export class BookmarkForm extends Component {
@@ -18,13 +20,14 @@ export class BookmarkForm extends Component {
     e.preventDefault();
     const apiFn = isNew ? bookmarksApi.create : bookmarksApi.update;
 
-    this.setState({ confirmLoading: true });
     this.props.form.validateFields((err, values) => {
-      console.log("values", values);
       if (!err) {
-        apiFn(values, !isNew && bookmarkData.id)
+        this.setState({ confirmLoading: true });
+        apiFn(
+          { ...values, url: normalizeUrl(values.url) },
+          !isNew && bookmarkData.id
+        )
           .then(({ data: bookmark }) => {
-            console.log("Bookmark", bookmark);
             handleSubmit(bookmark);
             this.props.closeModal();
           })
@@ -71,6 +74,15 @@ export class BookmarkForm extends Component {
                 {
                   required: true,
                   message: "Please input an URL"
+                },
+                {
+                  validator: (rule, value, callback) => {
+                    if (!validator.isURL(value)) {
+                      callback("Please enter a valid URL");
+                    }
+
+                    callback();
+                  }
                 }
               ]
             })(

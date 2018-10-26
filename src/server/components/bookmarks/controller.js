@@ -1,4 +1,11 @@
+const R = require("ramda");
+const Joi = require("joi");
+const sequelizeToJoi = require("@revolttv/sequelize-to-joi").default;
+const { isURL } = require("validator");
 const bookmarkService = require("./service");
+const Bookmark = require("./model");
+
+const bookmarkValidator = sequelizeToJoi(Bookmark);
 
 // @todo: Add PUT
 
@@ -24,13 +31,53 @@ const getBookmark = (req, res) => {
 };
 
 const addBookmark = (req, res) => {
-  bookmarkService
+  const bookmarkData = R.pick(["url", "title", "description"], req.body);
+
+  // @todo: Move joi validation to middleware
+  const validationResult = Joi.validate(bookmarkData, bookmarkValidator);
+
+  if (validationResult.error) {
+    return res.status(400).send({
+      status: "failed",
+      error: {
+        original: validationResult.error._object, // eslint-disable-line no-underscore-dangle
+        details: R.fromPairs(
+          validationResult.error.details.map(({ message, type, path }) => [
+            path,
+            {
+              message: message.replace(/['"]/g, ""),
+              type
+            }
+          ])
+        )
+      }
+    });
+  }
+
+  // Check
+  // default sequelizeToJoi validator will only check for uri format
+
+  if (!isURL(bookmarkData.url)) {
+    return res.status(400).send({
+      status: "failed",
+      error: {
+        original: bookmarkData,
+        details: {
+          url: {
+            message: "Bookmark url is not a valid url"
+          }
+        }
+      }
+    });
+  }
+
+  return bookmarkService
     .add(req.userId, {
       url: req.body.url,
       title: req.body.title,
       description: req.body.description
     })
-    .then(data => res.send(data));
+    .then(data => res.status(200).send(data));
 };
 
 const updateBookmark = (req, res) => {
