@@ -1,9 +1,9 @@
 const controller = require("./controller");
-const model = require("./model");
+const db = require("../../database/models");
 const factory = require("./factory");
 
 module.exports = {
   controller,
-  model,
+  model: db.User,
   factory
 };

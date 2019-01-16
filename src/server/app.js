@@ -4,13 +4,8 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-const sequelize = require("./database");
+require("./database");
 const router = require("./router");
-
-if (process.env.NODE_ENV === "development") {
-  // Force sync all models
-  sequelize.sync({ force: true });
-}
 
 const app = express();
 

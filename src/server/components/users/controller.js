@@ -3,8 +3,10 @@ const bcrypt = require("bcrypt");
 const Joi = require("joi");
 const sequelizeToJoi = require("@revolttv/sequelize-to-joi").default;
 const R = require("ramda");
-const User = require("./model");
+const db = require("../../database/models");
 const userService = require("./service");
+
+const { User } = db;
 
 const userValidator = sequelizeToJoi(User)
   // Need to validate the password outside of the model since

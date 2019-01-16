@@ -3,7 +3,9 @@ const Joi = require("joi");
 const sequelizeToJoi = require("@revolttv/sequelize-to-joi").default;
 const { isURL } = require("validator");
 const bookmarkService = require("./service");
-const Bookmark = require("./model");
+const db = require("../../database/models");
+
+const { Bookmark } = db;
 
 const bookmarkValidator = sequelizeToJoi(Bookmark);
 

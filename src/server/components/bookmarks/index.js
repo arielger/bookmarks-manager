@@ -1,9 +1,11 @@
 const controller = require("./controller");
-const model = require("./model");
 const factory = require("./factory");
+const db = require("../../database/models");
+
+const { Bookmark } = db;
 
 module.exports = {
   controller,
-  model,
+  model: Bookmark,
   factory
 };

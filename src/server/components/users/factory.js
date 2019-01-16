@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
 const faker = require("faker");
-const User = require("./model");
+const db = require("../../database/models");
+
+const { User } = db;
 
 const getRandomUserData = ({ email, ...props } = {}) => {
   // Use the same value for email and password for testing

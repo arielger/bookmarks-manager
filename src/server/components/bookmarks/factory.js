@@ -1,5 +1,7 @@
 const faker = require("faker");
-const Bookmark = require("./model");
+const db = require("../../database/models");
+
+const { Bookmark } = db;
 
 const getRandomBookmarkData = (userId, props = {}) => ({
   url: faker.internet.url(),

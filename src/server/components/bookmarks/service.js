@@ -1,27 +1,29 @@
-const Bookmarks = require("./model");
+const db = require("../../database/models");
+
+const { Bookmark } = db;
 
 const getAllFromUser = userId =>
-  Bookmarks.findAll({
+  Bookmark.findAll({
     where: { userId }
   });
 
 const getByIdFromUser = (userId, id) =>
-  Bookmarks.findOne({ where: { id, userId } });
+  Bookmark.findOne({ where: { id, userId } });
 
 const add = (userId, bookmark) =>
-  Bookmarks.create({
+  Bookmark.create({
     ...bookmark,
     userId
   });
 
 const updateByIdFromUser = (userId, bookmarkId, updatedData) =>
-  Bookmarks.update(updatedData, {
+  Bookmark.update(updatedData, {
     returning: true,
     where: { userId, id: bookmarkId }
   }).then(([, [updatedBookmark]]) => Promise.resolve(updatedBookmark));
 
 const deleteFromUser = (userId, id) =>
-  Bookmarks.findById(id, { where: { userId } }).then(bookmark => {
+  Bookmark.findById(id, { where: { userId } }).then(bookmark => {
     if (!bookmark) return bookmark;
     bookmark.destroy();
     return bookmark;
