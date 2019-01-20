@@ -1,5 +1,5 @@
 module.exports = {
-  up: (queryInterface, Sequelize) => {
+  up: (queryInterface, Sequelize) =>
     queryInterface.createTable("Bookmarks", {
       id: {
         type: Sequelize.INTEGER,
@@ -31,7 +31,6 @@ module.exports = {
       },
       createdAt: Sequelize.DATE,
       updatedAt: Sequelize.DATE
-    });
-  },
+    }),
   down: queryInterface => queryInterface.dropTable("Bookmarks")
 };
