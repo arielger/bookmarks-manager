@@ -4,7 +4,7 @@ const request = require("supertest");
 const jwt = require("jsonwebtoken");
 const NodeEnvironment = require("jest-environment-node");
 const app = require("../app");
-const sequelize = require("../database");
+const { sequelize } = require("../database");
 const {
   getRandomUserData,
   createRandomUser

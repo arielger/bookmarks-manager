@@ -1,4 +1,4 @@
-const sequelize = require("../database");
+const { sequelize } = require("../database");
 
 const globalSetup = async () => {
   await sequelize.sync({
