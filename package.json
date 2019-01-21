@@ -33,6 +33,7 @@
     "@revolttv/sequelize-to-joi": "^2.0.2",
     "bcrypt": "^3.0.0",
     "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
     "faker": "^4.1.0",
