@@ -10,7 +10,7 @@
     "yarn": "1.7.0"
   },
   "scripts": {
-    "server": "NODE_ENV=development node ./src/server/app.js",
+    "server": "node ./src/server/app.js",
     "test": "jest",
     "test:watch": "jest -o",
     "lint:js": "./node_modules/.bin/eslint --ext=js --ext=jsx .",
