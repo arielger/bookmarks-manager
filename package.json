@@ -31,8 +31,10 @@
   },
   "dependencies": {
     "@revolttv/sequelize-to-joi": "^2.0.2",
+    "axios": "^0.18.0",
     "bcrypt": "^3.0.0",
     "body-parser": "^1.18.3",
+    "cheerio": "^1.0.0-rc.2",
     "cors": "^2.8.5",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
