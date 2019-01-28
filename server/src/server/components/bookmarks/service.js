@@ -2,9 +2,11 @@ const db = require("../../database/models");
 
 const { Bookmark } = db;
 
-const getAllFromUser = userId =>
-  Bookmark.findAll({
-    where: { userId }
+const getFromUser = (userId, pageSize, page) =>
+  Bookmark.findAndCountAll({
+    where: { userId },
+    limit: pageSize,
+    offset: (page - 1) * pageSize
   });
 
 const getByIdFromUser = (userId, id) =>
@@ -31,7 +33,7 @@ const deleteFromUser = (userId, id) =>
 
 module.exports = {
   add,
-  getAllFromUser,
+  getFromUser,
   getByIdFromUser,
   updateByIdFromUser,
   deleteFromUser

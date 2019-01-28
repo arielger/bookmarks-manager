@@ -31,9 +31,27 @@ const getBookmarkDefaults = async bookmark => {
   }
 };
 
-// @todo: Implement pagination, filtering, sorting
+// @todo: Implement filtering, sorting
 const getBookmarks = (req, res) => {
-  bookmarkService.getAllFromUser(req.userId).then(data => res.send(data));
+  const PAGE_SIZE = 10;
+  const page = R.pipe(
+    R.defaultTo(1),
+    R.when(R.gt(1), R.always(1))
+  )(req.query.page);
+
+  bookmarkService.getFromUser(req.userId, PAGE_SIZE, page).then(result => {
+    const pageCount = Math.ceil(result.count / PAGE_SIZE);
+    const isLastPage = pageCount === page;
+
+    return res.send({
+      info: {
+        count: result.count,
+        pages: pageCount,
+        isLastPage
+      },
+      results: result.rows
+    });
+  });
 };
 
 const getBookmark = (req, res) => {

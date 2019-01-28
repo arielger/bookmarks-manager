@@ -1,4 +1,5 @@
 import axios from "axios";
+import qs from "qs";
 
 const BASE_URL =
   process.env.NODE_ENV === "development" ? "" : process.env.REACT_APP_API_URL;
@@ -22,7 +23,12 @@ export const users = {
 };
 
 export const bookmarks = {
-  getAll: () => axios.get("/bookmarks"),
+  getAll: page =>
+    axios.get(
+      `/bookmarks?${qs.stringify({
+        page: page || 1
+      })}`
+    ),
   create: bookmark => axios.post("/bookmarks", bookmark),
   update: (bookmark, bookmarkId) =>
     axios.put(`/bookmarks/${bookmarkId}`, bookmark),

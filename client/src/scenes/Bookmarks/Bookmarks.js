@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { List, Avatar, Button, message } from "antd";
+import { List, Avatar, Button, Spin, Icon } from "antd";
 import styled from "styled-components";
 import humanizeUrl from "humanize-url";
+import InfiniteScroll from "react-infinite-scroller";
 import BookmarkForm from "./BookmarkForm";
 import Sidebar from "./Sidebar";
 import { bookmarks as bookmarksApi } from "../../api";
@@ -16,7 +17,9 @@ const Wrapper = styled.div`
 const ListWrapper = styled.div`
   padding: 15px 30px;
   display: flex;
+  flex-direction: column;
   flex-grow: 1;
+  overflow-y: scroll;
 
   .bookmarks-list {
     width: 100%;
@@ -27,6 +30,11 @@ const ListWrapper = styled.div`
   }
 `;
 
+const SpinContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
 export default class Bookmarks extends Component {
   static propTypes = {
     logout: PropTypes.func.isRequired
@@ -35,6 +43,7 @@ export default class Bookmarks extends Component {
   state = {
     bookmarks: [],
     isFetching: false,
+    hasMore: true,
     isBookmarkModalOpen: false,
     modalBookmarkId: undefined
   };
@@ -49,8 +58,8 @@ export default class Bookmarks extends Component {
   editBookmark = bookmark => {
     this.setState(prevState => ({
       ...prevState,
-      bookmarks: prevState.bookmarks.map(
-        b => (b.id === bookmark.id ? bookmark : b)
+      bookmarks: prevState.bookmarks.map(b =>
+        b.id === bookmark.id ? bookmark : b
       )
     }));
   };
@@ -65,19 +74,6 @@ export default class Bookmarks extends Component {
   hideNewBookmarkModal = () => {
     this.setState({ isBookmarkModalOpen: false });
   };
-
-  componentDidMount() {
-    this.setState({ isFetching: true });
-
-    bookmarksApi
-      .getAll(this.props.userToken)
-      .then(({ data }) => {
-        this.setState({ isFetching: false, bookmarks: data });
-      })
-      .catch(error => {
-        console.error("Error:", error);
-      });
-  }
 
   deleteBookmark = bookmarkId => {
     this.setState(prevState => ({
@@ -94,9 +90,25 @@ export default class Bookmarks extends Component {
       });
   };
 
+  loadBookmarksPage = page => {
+    this.setState({ isFetching: true });
+    bookmarksApi
+      .getAll(page)
+      .then(({ data }) => {
+        this.setState(prevState => ({
+          isFetching: false,
+          hasMore: !data.info.isLastPage,
+          bookmarks: [...prevState.bookmarks, ...data.results]
+        }));
+      })
+      .catch(error => {
+        console.error("Error:", error);
+      });
+  };
+
   render() {
     const { logout } = this.props;
-    const { bookmarks, modalBookmarkId } = this.state;
+    const { isFetching, hasMore, bookmarks, modalBookmarkId } = this.state;
 
     return (
       <Wrapper>
@@ -107,44 +119,56 @@ export default class Bookmarks extends Component {
           logout={logout}
         />
         <ListWrapper>
-          <List
-            className="bookmarks-list"
-            itemLayout="horizontal"
-            dataSource={bookmarks}
-            renderItem={bookmark => (
-              <List.Item
-                actions={[
-                  <Button
-                    icon="edit"
-                    onClick={() => {
-                      this.showBookmarkModal(bookmark.id);
-                    }}
-                  />,
-                  <Button
-                    icon="delete"
-                    type="danger"
-                    onClick={() => {
-                      this.deleteBookmark(bookmark.id);
-                    }}
-                  />
-                ]}
-              >
-                <List.Item.Meta
-                  avatar={
-                    <Avatar
-                      shape="square"
-                      size="large"
-                      icon="link"
-                      src={`https://logo-core.clearbit.com/${bookmark.url}`}
-                      className="avatar"
+          <InfiniteScroll
+            initialLoad={true}
+            loadMore={this.loadBookmarksPage}
+            hasMore={!isFetching && hasMore}
+            useWindow={false}
+          >
+            <List
+              className="bookmarks-list"
+              itemLayout="horizontal"
+              dataSource={bookmarks}
+              renderItem={bookmark => (
+                <List.Item
+                  actions={[
+                    <Button
+                      icon="edit"
+                      onClick={() => {
+                        this.showBookmarkModal(bookmark.id);
+                      }}
+                    />,
+                    <Button
+                      icon="delete"
+                      type="danger"
+                      onClick={() => {
+                        this.deleteBookmark(bookmark.id);
+                      }}
                     />
-                  }
-                  title={bookmark.title}
-                  description={humanizeUrl(bookmark.url)}
-                />
-              </List.Item>
+                  ]}
+                >
+                  <List.Item.Meta
+                    avatar={
+                      <Avatar
+                        shape="square"
+                        size="large"
+                        icon="link"
+                        src={`https://logo-core.clearbit.com/${bookmark.url}`}
+                        className="avatar"
+                      />
+                    }
+                    title={bookmark.title}
+                    description={humanizeUrl(bookmark.url)}
+                  />
+                </List.Item>
+              )}
+            />
+            {isFetching && (
+              <SpinContainer>
+                <Spin indicator={<Icon type="loading" spin />} />
+              </SpinContainer>
             )}
-          />
+          </InfiniteScroll>
         </ListWrapper>
         <BookmarkForm
           isNew={!modalBookmarkId}
