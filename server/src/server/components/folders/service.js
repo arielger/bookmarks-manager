@@ -13,7 +13,14 @@ const add = (userId, folder) =>
     userId
   });
 
+const updateByIdFromUser = (userId, folderId, updatedData) =>
+  Folder.update(updatedData, {
+    returning: true,
+    where: { userId, id: folderId }
+  }).then(([, [updatedFolder]]) => Promise.resolve(updatedFolder));
+
 module.exports = {
   getAllFromUser,
-  add
+  add,
+  updateByIdFromUser
 };
