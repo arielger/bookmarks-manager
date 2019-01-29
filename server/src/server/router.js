@@ -1,4 +1,5 @@
 const bookmarkController = require("./components/bookmarks/controller");
+const folderController = require("./components/folders/controller");
 const tagController = require("./components/tags/controller");
 const userController = require("./components/users/controller");
 const verifyToken = require("./middleware/verifyToken");
@@ -11,6 +12,10 @@ module.exports.set = app => {
   app.put("/bookmarks/:id", verifyToken, bookmarkController.updateBookmark);
   app.get("/bookmarks/:id", verifyToken, bookmarkController.getBookmark);
   app.delete("/bookmarks/:id", verifyToken, bookmarkController.deleteBookmark);
+
+  // Folders
+  app.get("/folders", verifyToken, folderController.getFolders);
+  app.post("/folders", verifyToken, folderController.addFolder);
 
   // Tags
   app.get("/tags", verifyToken, tagController.getTags);
