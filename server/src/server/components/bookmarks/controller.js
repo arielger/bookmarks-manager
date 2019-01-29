@@ -7,6 +7,8 @@ const { isURL } = require("validator");
 const bookmarkService = require("./service");
 const db = require("../../database/models");
 
+const isValidNumber = R.both(R.is(Number), R.complement(R.equals(NaN)));
+
 const { Bookmark } = db;
 
 const bookmarkValidator = sequelizeToJoi(Bookmark);
@@ -35,8 +37,8 @@ const getBookmarkDefaults = async bookmark => {
 const getBookmarks = (req, res) => {
   const PAGE_SIZE = 10;
   const page = R.pipe(
-    R.defaultTo(1),
-    R.when(R.gt(1), R.always(1))
+    n => parseInt(n, 10),
+    R.when(R.either(R.complement(isValidNumber), R.gt(1)), R.always(1))
   )(req.query.page);
 
   bookmarkService.getFromUser(req.userId, PAGE_SIZE, page).then(result => {
