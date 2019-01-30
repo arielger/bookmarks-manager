@@ -23,14 +23,20 @@ export const users = {
 };
 
 export const bookmarks = {
-  getAll: page =>
+  fetch: (page, folderId) =>
     axios.get(
       `/bookmarks?${qs.stringify({
-        page: page || 1
+        page: page || 1,
+        folderId
       })}`
     ),
   create: bookmark => axios.post("/bookmarks", bookmark),
   update: (bookmark, bookmarkId) =>
     axios.put(`/bookmarks/${bookmarkId}`, bookmark),
   delete: bookmarkId => axios.delete(`/bookmarks/${bookmarkId}`)
+};
+
+export const folders = {
+  getAll: () => axios.get("/folders"),
+  create: folder => axios.post("/folders", folder)
 };

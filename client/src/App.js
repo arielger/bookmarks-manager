@@ -37,12 +37,12 @@ class App extends Component {
             </Switch>
           )}
           <Route
-            path="/"
-            exact
-            render={() => (
+            path={["/folders/:folderId", "/"]}
+            render={props => (
               <Bookmarks
                 logout={this.logout}
                 userToken={this.state.userToken}
+                {...props}
               />
             )}
           />

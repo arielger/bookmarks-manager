@@ -1,5 +1,6 @@
 import React from "react";
-import { Button } from "antd";
+import { Button, Icon, Form, Input } from "antd";
+import { Link as ReactRouterLink } from "react-router-dom";
 import styled from "styled-components";
 
 const Sidebar = styled.div`
@@ -21,10 +22,53 @@ const Title = styled.h1`
   font-size: 48px;
 `;
 
-export default ({ logout, showAddBookmark }) => {
+const Link = styled(ReactRouterLink)`
+  display: block;
+`;
+
+const CreateFolderBtn = ({ createFolder }) => {
+  const [isActive, setIsActive] = React.useState(false);
+  const [folderTitle, setFolderTitle] = React.useState("");
+
+  return isActive ? (
+    <Input
+      value={folderTitle}
+      onChange={e => setFolderTitle(e.target.value)}
+      onPressEnter={e => {
+        createFolder({ title: e.target.value });
+      }}
+      onBlur={() => setIsActive(false)}
+    />
+  ) : (
+    <Button
+      className="button"
+      onClick={() => setIsActive(true)}
+      icon="folder-add"
+      size="large"
+      block={true}
+    >
+      Create folder
+    </Button>
+  );
+};
+
+export default ({ createFolder, folders, logout, showAddBookmark }) => {
   return (
     <Sidebar>
       <Title>📌</Title>
+      <div>
+        <Link to="/">
+          <Icon type="pushpin" />
+          All bookmarks
+        </Link>
+        {folders.map(folder => (
+          <Link to={`/folders/${folder.id}`}>
+            <Icon type="folder" />
+            {folder.title}
+          </Link>
+        ))}
+        <CreateFolderBtn createFolder={createFolder} />
+      </div>
       <div>
         <Button
           type="primary"

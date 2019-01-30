@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import * as R from "ramda";
 import { List, Avatar, Button, Spin, Icon } from "antd";
 import styled from "styled-components";
 import humanizeUrl from "humanize-url";
 import InfiniteScroll from "react-infinite-scroller";
 import BookmarkForm from "./BookmarkForm";
 import Sidebar from "./Sidebar";
-import { bookmarks as bookmarksApi } from "../../api";
+import { bookmarks as bookmarksApi, folders as foldersApi } from "../../api";
 
 const Wrapper = styled.div`
   display: flex;
@@ -42,11 +43,32 @@ export default class Bookmarks extends Component {
 
   state = {
     bookmarks: [],
+    folders: [],
     isFetching: false,
     hasMore: true,
     isBookmarkModalOpen: false,
     modalBookmarkId: undefined
   };
+
+  componentDidMount() {
+    foldersApi.getAll().then(({ data: folders }) => {
+      this.setState({ folders });
+    });
+  }
+
+  componentDidUpdate({ match: prevMatch }) {
+    const { match } = this.props;
+
+    if (
+      R.path(["params", "folderId"], match) !==
+      R.path(["params", "folderId"], prevMatch)
+    ) {
+      this.setState({
+        bookmarks: [],
+        hasMore: true
+      });
+    }
+  }
 
   addBookmark = bookmark => {
     this.setState(prevState => ({
@@ -91,13 +113,16 @@ export default class Bookmarks extends Component {
   };
 
   loadBookmarksPage = page => {
+    const { match } = this.props;
+    const folderId = R.path(["params", "folderId"], match);
+
     this.setState({ isFetching: true });
     bookmarksApi
-      .getAll(page)
+      .fetch(page, folderId)
       .then(({ data }) => {
         this.setState(prevState => ({
           isFetching: false,
-          hasMore: !data.info.isLastPage,
+          hasMore: data.info.morePagesAvailable,
           bookmarks: [...prevState.bookmarks, ...data.results]
         }));
       })
@@ -107,12 +132,20 @@ export default class Bookmarks extends Component {
   };
 
   render() {
-    const { logout } = this.props;
-    const { isFetching, hasMore, bookmarks, modalBookmarkId } = this.state;
+    const { logout, match } = this.props;
+    const {
+      folders,
+      isFetching,
+      hasMore,
+      bookmarks,
+      modalBookmarkId
+    } = this.state;
 
     return (
       <Wrapper>
         <Sidebar
+          createFolder={foldersApi.create}
+          folders={folders}
           showAddBookmark={() => {
             this.showBookmarkModal();
           }}
@@ -120,6 +153,7 @@ export default class Bookmarks extends Component {
         />
         <ListWrapper>
           <InfiniteScroll
+            key={R.path(["params", "folderId"], match)}
             initialLoad={true}
             loadMore={this.loadBookmarksPage}
             hasMore={!isFetching && hasMore}
