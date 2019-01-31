@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import * as R from "ramda";
 import { List, Avatar, Button, Spin, Icon } from "antd";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import humanizeUrl from "humanize-url";
 import InfiniteScroll from "react-infinite-scroller";
 import BookmarkForm from "./BookmarkForm";
@@ -12,7 +12,6 @@ import { bookmarks as bookmarksApi, folders as foldersApi } from "../../api";
 const Wrapper = styled.div`
   display: flex;
   height: 100vh;
-  background-color: #f7f8fc;
 `;
 
 const ListWrapper = styled.div`

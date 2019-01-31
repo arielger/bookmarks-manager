@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Form, Icon, Input, Button, Checkbox, message } from "antd";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import { users as usersApi } from "../../api";
 
 const FormWrapper = styled.div`
