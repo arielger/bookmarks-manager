@@ -130,6 +130,14 @@ export default class Bookmarks extends Component {
       });
   };
 
+  createFolder = folder => {
+    foldersApi.create(folder).then(({ data: newFolder }) => {
+      this.setState(prevState => ({
+        folders: R.append(newFolder, prevState.folders)
+      }));
+    });
+  };
+
   render() {
     const { logout, match } = this.props;
     const {
@@ -143,7 +151,7 @@ export default class Bookmarks extends Component {
     return (
       <Wrapper>
         <Sidebar
-          createFolder={foldersApi.create}
+          createFolder={this.createFolder}
           folders={folders}
           showAddBookmark={() => {
             this.showBookmarkModal();
