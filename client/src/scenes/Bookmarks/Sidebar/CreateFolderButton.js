@@ -1,7 +1,6 @@
 import React from "react";
-import { Icon, Form, Input } from "antd";
+import { Icon, Input } from "antd";
 import styled from "styled-components/macro";
-import { useKeyPress } from "../../../hooks";
 
 const Wrapper = styled.button`
   background-color: transparent;

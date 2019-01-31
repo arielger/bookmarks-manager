@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Icon, Form, Input } from "antd";
+import { Button, Icon } from "antd";
 import { NavLink as RRNavLink } from "react-router-dom";
 import styled from "styled-components/macro";
 
@@ -66,7 +66,11 @@ const Link = styled(RRNavLink)`
 export default ({ createFolder, folders, logout, showAddBookmark }) => {
   return (
     <Sidebar>
-      <Title>📌</Title>
+      <Title>
+        <span role="img" aria-labelledby="bookmarks">
+          📌
+        </span>
+      </Title>
       <FoldersContainer>
         <Link to="/" exact style={{ marginBottom: "16px" }}>
           <Icon type="pushpin" />
