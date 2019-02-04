@@ -15,7 +15,9 @@
     "test:watch": "jest -o",
     "lint:js": "./node_modules/.bin/eslint --ext=js --ext=jsx .",
     "db:seed:all": "./node_modules/.bin/sequelize db:seed:all",
-    "db:seed:undo:all": "./node_modules/.bin/sequelize db:seed:undo:all"
+    "db:seed:undo:all": "./node_modules/.bin/sequelize db:seed:undo:all",
+    "db:migrations:all": "./node_modules/.bin/sequelize db:migrate",
+    "db:migrations:undo:all": "./node_modules/.bin/sequelize db:migrate:undo:all"
   },
   "husky": {
     "hooks": {
