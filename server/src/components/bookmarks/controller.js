@@ -84,7 +84,10 @@ const getBookmark = (req, res) => {
 };
 
 const addBookmark = async (req, res) => {
-  const bookmarkData = R.pick(["url", "title", "description"], req.body);
+  const bookmarkData = R.pick(
+    ["url", "title", "description", "folderId"],
+    req.body
+  );
 
   // @todo: Move joi validation to middleware
   const validationResult = Joi.validate(bookmarkData, bookmarkValidator);

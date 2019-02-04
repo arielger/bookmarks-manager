@@ -148,6 +148,8 @@ export default class Bookmarks extends Component {
       modalBookmarkId
     } = this.state;
 
+    const folderId = R.path(["params", "folderId"], match);
+
     return (
       <Wrapper>
         <Sidebar
@@ -219,6 +221,7 @@ export default class Bookmarks extends Component {
           handleSubmit={modalBookmarkId ? this.editBookmark : this.addBookmark}
           visible={this.state.isBookmarkModalOpen}
           closeModal={this.hideNewBookmarkModal}
+          folderId={folderId}
         />
       </Wrapper>
     );

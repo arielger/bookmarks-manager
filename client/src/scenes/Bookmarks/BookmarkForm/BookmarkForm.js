@@ -15,7 +15,7 @@ export class BookmarkForm extends Component {
   state = { confirmLoading: false };
 
   handleSubmit = e => {
-    const { handleSubmit, isNew, bookmarkData } = this.props;
+    const { handleSubmit, isNew, bookmarkData, folderId } = this.props;
 
     e.preventDefault();
     const apiFn = isNew ? bookmarksApi.create : bookmarksApi.update;
@@ -24,7 +24,7 @@ export class BookmarkForm extends Component {
       if (!err) {
         this.setState({ confirmLoading: true });
         apiFn(
-          { ...values, url: normalizeUrl(values.url) },
+          { ...values, url: normalizeUrl(values.url), folderId },
           !isNew && bookmarkData.id
         )
           .then(({ data: bookmark }) => {
