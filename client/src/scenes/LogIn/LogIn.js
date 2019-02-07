@@ -42,7 +42,7 @@ class LogIn extends Component {
         this.setState({ isLoading: true });
         usersApi
           .login(values)
-          .then(({ data: { token } }) => {
+          .then(({ token }) => {
             this.props.setUserToken(token);
             this.setState({ isLoading: false });
           })

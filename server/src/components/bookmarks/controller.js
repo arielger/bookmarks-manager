@@ -18,7 +18,7 @@ const getBookmarkDefaults = async bookmark => {
   if (bookmark.title && bookmark.description) return bookmark;
 
   try {
-    const { data } = await axios.get(bookmark.url);
+    const data = await axios.get(bookmark.url);
 
     const $ = cheerio.load(data);
     return R.pipe(

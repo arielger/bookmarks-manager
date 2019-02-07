@@ -1,13 +1,18 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
+import React from "react";
 import * as R from "ramda";
-import { List, Avatar, Button, Spin, Icon } from "antd";
+import { connect } from "react-redux";
+import { List, Avatar, Button } from "antd";
 import styled from "styled-components/macro";
 import humanizeUrl from "humanize-url";
 import InfiniteScroll from "react-infinite-scroller";
 import BookmarkForm from "./BookmarkForm";
 import Sidebar from "./Sidebar";
-import { bookmarks as bookmarksApi, folders as foldersApi } from "../../api";
+import {
+  loadBookmarksPage,
+  createBookmark,
+  deleteBookmark,
+  changeFolder
+} from "../../store/bookmarks";
 
 const Wrapper = styled.div`
   display: flex;
@@ -30,162 +35,82 @@ const ListWrapper = styled.div`
   }
 `;
 
-const SpinContainer = styled.div`
-  display: flex;
-  justify-content: center;
-`;
-
-export default class Bookmarks extends Component {
-  static propTypes = {
-    logout: PropTypes.func.isRequired
-  };
-
-  state = {
-    bookmarks: [],
-    folders: [],
-    isFetching: false,
-    hasMore: true,
-    isBookmarkModalOpen: false,
-    modalBookmarkId: undefined
-  };
-
-  componentDidMount() {
-    foldersApi.getAll().then(({ data: folders }) => {
-      this.setState({ folders });
-    });
+const Bookmarks = connect(
+  ({ bookmarks }) => ({
+    bookmarks: R.reject(R.propEq("hide", true), bookmarks.data),
+    isLoading: bookmarks.isLoading,
+    isNewBookmarkLoading: bookmarks.isNewBookmarkLoading,
+    morePagesAvailable: bookmarks.morePagesAvailable
+  }),
+  {
+    loadBookmarksPage,
+    createBookmark,
+    deleteBookmark,
+    changeFolder
   }
-
-  componentDidUpdate({ match: prevMatch }) {
-    const { match } = this.props;
-
-    if (
-      R.path(["params", "folderId"], match) !==
-      R.path(["params", "folderId"], prevMatch)
-    ) {
-      this.setState({
-        bookmarks: [],
-        hasMore: true
-      });
-    }
-  }
-
-  addBookmark = bookmark => {
-    this.setState(prevState => ({
-      ...prevState,
-      bookmarks: prevState.bookmarks.concat(bookmark)
-    }));
-  };
-
-  editBookmark = bookmark => {
-    this.setState(prevState => ({
-      ...prevState,
-      bookmarks: prevState.bookmarks.map(b =>
-        b.id === bookmark.id ? bookmark : b
-      )
-    }));
-  };
-
-  showBookmarkModal = bookmarkId => {
-    this.setState({
-      isBookmarkModalOpen: true,
-      modalBookmarkId: bookmarkId
-    });
-  };
-
-  hideNewBookmarkModal = () => {
-    this.setState({ isBookmarkModalOpen: false });
-  };
-
-  deleteBookmark = bookmarkId => {
-    this.setState(prevState => ({
-      ...prevState,
-      bookmarks: prevState.bookmarks.filter(b => b.id !== bookmarkId)
-    }));
-    bookmarksApi
-      .delete(bookmarkId)
-      .then(({ data }) => {
-        console.log("Deleted bookmark:", data);
-      })
-      .catch(error => {
-        console.log("Error:", error);
-      });
-  };
-
-  loadBookmarksPage = page => {
-    const { match } = this.props;
+)(
+  ({
+    bookmarks = [],
+    isLoading,
+    isNewBookmarkLoading,
+    morePagesAvailable,
+    loadBookmarksPage,
+    createBookmark,
+    editBookmark,
+    deleteBookmark,
+    changeFolder,
+    logout,
+    match
+  }) => {
     const folderId = R.path(["params", "folderId"], match);
 
-    this.setState({ isFetching: true });
-    bookmarksApi
-      .fetch(page, folderId)
-      .then(({ data }) => {
-        this.setState(prevState => ({
-          isFetching: false,
-          hasMore: data.info.morePagesAvailable,
-          bookmarks: [...prevState.bookmarks, ...data.results]
-        }));
-      })
-      .catch(error => {
-        console.error("Error:", error);
-      });
-  };
-
-  createFolder = folder => {
-    foldersApi.create(folder).then(({ data: newFolder }) => {
-      this.setState(prevState => ({
-        folders: R.append(newFolder, prevState.folders)
-      }));
+    const [bookmarkModal, setBookmarkModal] = React.useState({
+      isOpen: false,
+      id: undefined
     });
-  };
 
-  render() {
-    const { logout, match } = this.props;
-    const {
-      folders,
-      isFetching,
-      hasMore,
-      bookmarks,
-      modalBookmarkId
-    } = this.state;
-
-    const folderId = R.path(["params", "folderId"], match);
+    React.useEffect(
+      () => {
+        changeFolder();
+      },
+      [folderId]
+    );
 
     return (
       <Wrapper>
         <Sidebar
-          createFolder={this.createFolder}
-          folders={folders}
           showAddBookmark={() => {
-            this.showBookmarkModal();
+            setBookmarkModal({ isOpen: true });
           }}
           logout={logout}
         />
         <ListWrapper>
           <InfiniteScroll
-            key={R.path(["params", "folderId"], match)}
+            key={folderId}
             initialLoad={true}
-            loadMore={this.loadBookmarksPage}
-            hasMore={!isFetching && hasMore}
+            loadMore={page => loadBookmarksPage(page, folderId)}
+            hasMore={!isLoading && morePagesAvailable}
             useWindow={false}
           >
             <List
               className="bookmarks-list"
               itemLayout="horizontal"
               dataSource={bookmarks}
+              loading={isLoading}
               renderItem={bookmark => (
                 <List.Item
                   actions={[
                     <Button
                       icon="edit"
                       onClick={() => {
-                        this.showBookmarkModal(bookmark.id);
+                        setBookmarkModal({ isOpen: true, id: bookmark.id });
                       }}
                     />,
                     <Button
                       icon="delete"
                       type="danger"
                       onClick={() => {
-                        this.deleteBookmark(bookmark.id);
+                        deleteBookmark(bookmark.id);
                       }}
                     />
                   ]}
@@ -206,24 +131,24 @@ export default class Bookmarks extends Component {
                 </List.Item>
               )}
             />
-            {isFetching && (
-              <SpinContainer>
-                <Spin indicator={<Icon type="loading" spin />} />
-              </SpinContainer>
-            )}
           </InfiniteScroll>
         </ListWrapper>
         <BookmarkForm
-          isNew={!modalBookmarkId}
+          isNew={!bookmarkModal.id}
+          isLoading={isNewBookmarkLoading}
           bookmarkData={
-            modalBookmarkId ? bookmarks.find(b => b.id === modalBookmarkId) : {}
+            bookmarkModal.id
+              ? bookmarks.find(b => b.id === bookmarkModal.id)
+              : {}
           }
-          handleSubmit={modalBookmarkId ? this.editBookmark : this.addBookmark}
-          visible={this.state.isBookmarkModalOpen}
-          closeModal={this.hideNewBookmarkModal}
+          handleSubmit={bookmarkModal.id ? editBookmark : createBookmark}
+          visible={bookmarkModal.isOpen}
+          closeModal={() => setBookmarkModal({ isOpen: false, id: undefined })}
           folderId={folderId}
         />
       </Wrapper>
     );
   }
-}
+);
+
+export default Bookmarks;

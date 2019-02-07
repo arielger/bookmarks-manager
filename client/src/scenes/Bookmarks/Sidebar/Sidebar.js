@@ -1,11 +1,14 @@
 import React from "react";
+import * as R from "ramda";
+import { connect } from "react-redux";
 import { Button, Icon } from "antd";
 import { NavLink as RRNavLink } from "react-router-dom";
 import styled from "styled-components/macro";
 
 import CreateFolderButton from "./CreateFolderButton";
+import { loadFolders, createFolder } from "../../../store/folders";
 
-const Sidebar = styled.div`
+const SidebarWrapper = styled.div`
   background-color: #f1f3f5;
   width: 300px;
   min-width: 300px;
@@ -63,9 +66,21 @@ const Link = styled(RRNavLink)`
   }
 `;
 
-export default ({ createFolder, folders, logout, showAddBookmark }) => {
+const Sidebar = connect(
+  ({ folders }) => ({
+    folders: R.propOr([], "data", folders)
+  }),
+  {
+    loadFolders,
+    createFolder
+  }
+)(({ loadFolders, createFolder, folders, logout, showAddBookmark }) => {
+  React.useEffect(() => {
+    loadFolders();
+  }, []);
+
   return (
-    <Sidebar>
+    <SidebarWrapper>
       <Title>
         <span role="img" aria-labelledby="bookmarks">
           📌
@@ -78,12 +93,13 @@ export default ({ createFolder, folders, logout, showAddBookmark }) => {
         </Link>
         <h4>Folders</h4>
         <FolderList>
-          {folders.map(folder => (
-            <Link to={`/folders/${folder.id}`}>
-              <Icon type="folder" />
-              {folder.title}
-            </Link>
-          ))}
+          {folders &&
+            folders.map(folder => (
+              <Link to={`/folders/${folder.id}`}>
+                <Icon type="folder" />
+                {folder.title}
+              </Link>
+            ))}
         </FolderList>
       </FoldersContainer>
       <CreateFolderButton createFolder={createFolder} />
@@ -109,6 +125,8 @@ export default ({ createFolder, folders, logout, showAddBookmark }) => {
           Log out
         </Button>
       </BottomContainer>
-    </Sidebar>
+    </SidebarWrapper>
   );
-};
+});
+
+export default Sidebar;

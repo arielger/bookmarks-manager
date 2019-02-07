@@ -1,4 +1,5 @@
 import axios from "axios";
+import * as R from "ramda";
 import qs from "qs";
 
 const BASE_URL =
@@ -7,14 +8,16 @@ const BASE_URL =
 axios.defaults.baseURL = BASE_URL;
 axios.defaults.headers.common["Content-Type"] = "application/json";
 
-// @todo: Add CRUD endpoints creator
-
 axios.interceptors.request.use(function(config) {
   const token = sessionStorage.getItem("jwtToken");
   if (token) {
     config.headers.common["x-access-token"] = token;
   }
   return config;
+});
+
+axios.interceptors.response.use(R.propOr({}, "data"), function(error) {
+  return Promise.reject(R.pathOr({}, ["response", "data"], error));
 });
 
 export const users = {
@@ -37,6 +40,6 @@ export const bookmarks = {
 };
 
 export const folders = {
-  getAll: () => axios.get("/folders"),
+  fetch: () => axios.get("/folders"),
   create: folder => axios.post("/folders", folder)
 };

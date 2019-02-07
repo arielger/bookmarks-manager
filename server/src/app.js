@@ -19,6 +19,11 @@ app.use(
 );
 router.set(app);
 
+app.use((req, res) => {
+  res.status(404);
+  res.send({ error: "Not found" });
+});
+
 // Prevent bounding server to port in test env
 if (process.env.NODE_ENV !== "test") {
   const port = process.env.PORT || 5000;

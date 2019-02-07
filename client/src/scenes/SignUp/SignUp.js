@@ -26,7 +26,7 @@ class SignUp extends Component {
       if (!err) {
         usersApi
           .signup(values)
-          .then(({ data: { token } }) => {
+          .then(({ token }) => {
             this.props.setUserToken(token);
           })
           // @todo: Refactor axios error handling
