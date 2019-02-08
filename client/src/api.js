@@ -34,13 +34,15 @@ export const bookmarks = {
       })}`
     ),
   create: bookmark => axios.post("/bookmarks", bookmark),
-  update: (bookmark, bookmarkId) =>
-    axios.put(`/bookmarks/${bookmarkId}`, bookmark),
+  update: (bookmarkData, bookmarkId) =>
+    axios.put(`/bookmarks/${bookmarkId}`, bookmarkData),
   delete: bookmarkId => axios.delete(`/bookmarks/${bookmarkId}`)
 };
 
 export const folders = {
   fetch: () => axios.get("/folders"),
   create: folder => axios.post("/folders", folder),
+  update: (folderData, folderId) =>
+    axios.put(`/folders/${folderId}`, folderData),
   delete: folderId => axios.delete(`/folders/${folderId}`)
 };

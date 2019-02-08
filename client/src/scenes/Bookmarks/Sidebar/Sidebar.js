@@ -6,9 +6,11 @@ import { NavLink as RRNavLink } from "react-router-dom";
 import styled from "styled-components/macro";
 
 import CreateFolderButton from "./CreateFolderButton";
+import FolderForm from "./FolderForm";
 import {
   loadFolders,
   createFolder,
+  editFolder,
   deleteFolder
 } from "../../../store/folders";
 
@@ -59,12 +61,12 @@ const Link = styled(RRNavLink)`
   &:focus {
     background-color: rgba(0, 0, 0, 0.1);
     text-decoration: none;
-    .delete-btn {
+    .edit-btn {
       display: inline-block;
     }
   }
 
-  .delete-btn {
+  .edit-btn {
     display: none;
   }
 
@@ -80,22 +82,33 @@ const Link = styled(RRNavLink)`
 
 const Sidebar = connect(
   ({ folders }) => ({
-    folders: R.propOr([], "data", folders)
+    folders: folders.data,
+    isEditFolderLoading: folders.isEditFolderLoading,
+    isDeleteFolderLoading: folders.isDeleteFolderLoading
   }),
   {
     loadFolders,
     createFolder,
+    editFolder,
     deleteFolder
   }
 )(
   ({
     loadFolders,
     createFolder,
+    editFolder,
     deleteFolder,
     folders,
     logout,
-    showAddBookmark
+    showAddBookmark,
+    isEditFolderLoading,
+    isDeleteFolderLoading
   }) => {
+    const [folderModal, setFolderModal] = React.useState({
+      isOpen: false,
+      id: undefined
+    });
+
     React.useEffect(() => {
       loadFolders();
     }, []);
@@ -118,26 +131,17 @@ const Sidebar = connect(
           <FolderList>
             {folders &&
               folders.map(folder => (
-                <Link to={`/folders/${folder.id}`}>
+                <Link to={`/folders/${folder.id}`} key={folder.id}>
                   <div>
                     <Icon type="folder" className="folder-icon" />
                     {folder.title}
                   </div>
                   <Button
-                    className="delete-btn"
-                    onClick={() => {
-                      if (
-                        window.confirm(
-                          `Are you sure you want to delete the folder "${
-                            folder.title
-                          }"? This will also delete all bookmarks inside the folder`
-                        )
-                      ) {
-                        deleteFolder(folder.id);
-                      }
-                    }}
-                    type="danger"
-                    icon="delete"
+                    onClick={() =>
+                      setFolderModal({ isOpen: true, id: folder.id })
+                    }
+                    className="edit-btn"
+                    icon="edit"
                   />
                 </Link>
               ))}
@@ -166,6 +170,20 @@ const Sidebar = connect(
             Log out
           </Button>
         </BottomContainer>
+        {folderModal.isOpen && (
+          <FolderForm
+            handleDelete={() => deleteFolder(folderModal.id)}
+            handleUpdate={folderData => editFolder(folderData, folderModal.id)}
+            folder={R.pipe(
+              R.find(R.propEq("id", folderModal.id)),
+              R.defaultTo({})
+            )(folders)}
+            isLoadingEdit={isEditFolderLoading}
+            isLoadingDelete={isDeleteFolderLoading}
+            visible={folderModal.isOpen}
+            closeModal={() => setFolderModal({ isOpen: false, id: undefined })}
+          />
+        )}
       </SidebarWrapper>
     );
   }

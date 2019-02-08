@@ -15,12 +15,20 @@ const createFolder = folderData => ({
   promise: foldersApi.create(folderData)
 });
 
+const editFolder = (folderData, folderId) => ({
+  type: "editFolder",
+  promise: foldersApi.update(folderData, folderId),
+  meta: {
+    folderId
+  }
+});
+
 const deleteFolder = folderId => ({
   type: "deleteFolder",
   promise: foldersApi.delete(folderId),
   meta: {
     folderId,
-    onSuccess: (result, getState) => {
+    onSuccess: () => {
       history.push("/");
     }
   }
@@ -31,6 +39,8 @@ const foldersSlice = createSlice({
   initialState: {
     isLoading: false,
     isNewFolderLoading: false,
+    isEditFolderLoading: false,
+    isDeleteFolderLoading: false,
     data: []
   },
   extraReducers: {
@@ -59,33 +69,45 @@ const foldersSlice = createSlice({
         finish: R.assoc("isNewFolderLoading", false)
       });
     },
-    deleteFolder(state, action) {
+    editFolder(state, action) {
       return handle(state, action, {
-        start: R.evolve({
+        start: R.assoc("isEditFolderLoading", true),
+        failure: prevState => {
+          notification.error({
+            message: "Error",
+            description: "There was an error trying to edit the folder"
+          });
+          return prevState;
+        },
+        success: R.evolve({
           data: R.map(
-            R.when(R.propEq("id", action.meta.folderId), R.assoc("hide", true))
+            R.when(
+              R.propEq("id", action.meta.folderId),
+              R.mergeLeft(action.payload)
+            )
           )
         }),
+        finish: R.assoc("isEditFolderLoading", false)
+      });
+    },
+    deleteFolder(state, action) {
+      return handle(state, action, {
+        start: R.assoc("isDeleteFolderLoading", true),
         failure: prevState => {
           notification.error({
             message: "Error",
             description: "There was an error trying to delete the folder"
           });
-
-          return R.evolve({
-            data: R.map(
-              R.when(R.propEq("id", action.meta.folderId)),
-              R.dissoc("hide")
-            )
-          })(prevState);
+          return prevState;
         },
         success: R.evolve({
           data: R.reject(R.propEq("id", action.meta.folderId))
-        })
+        }),
+        finish: R.assoc("isDeleteFolderLoading", false)
       });
     }
   }
 });
 
-export { loadFolders, createFolder, deleteFolder };
+export { loadFolders, createFolder, editFolder, deleteFolder };
 export default foldersSlice.reducer;
