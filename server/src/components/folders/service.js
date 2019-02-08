@@ -19,8 +19,16 @@ const updateByIdFromUser = (userId, folderId, updatedData) =>
     where: { userId, id: folderId }
   }).then(([, [updatedFolder]]) => Promise.resolve(updatedFolder));
 
+const deleteFromUser = (userId, id) =>
+  Folder.findById(id, { where: { userId } }).then(folder => {
+    if (!folder) return folder;
+    folder.destroy();
+    return folder;
+  });
+
 module.exports = {
   getAllFromUser,
   add,
-  updateByIdFromUser
+  updateByIdFromUser,
+  deleteFromUser
 };

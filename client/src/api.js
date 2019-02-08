@@ -41,5 +41,6 @@ export const bookmarks = {
 
 export const folders = {
   fetch: () => axios.get("/folders"),
-  create: folder => axios.post("/folders", folder)
+  create: folder => axios.post("/folders", folder),
+  delete: folderId => axios.delete(`/folders/${folderId}`)
 };

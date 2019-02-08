@@ -3,6 +3,7 @@ import { createSlice } from "redux-starter-kit";
 import { handle } from "redux-pack";
 import { notification } from "antd";
 import { folders as foldersApi } from "../api";
+import history from "../history";
 
 const loadFolders = (page, folderId) => ({
   type: "loadFolders",
@@ -12,6 +13,17 @@ const loadFolders = (page, folderId) => ({
 const createFolder = folderData => ({
   type: "createFolder",
   promise: foldersApi.create(folderData)
+});
+
+const deleteFolder = folderId => ({
+  type: "deleteFolder",
+  promise: foldersApi.delete(folderId),
+  meta: {
+    folderId,
+    onSuccess: (result, getState) => {
+      history.push("/");
+    }
+  }
 });
 
 const foldersSlice = createSlice({
@@ -46,9 +58,34 @@ const foldersSlice = createSlice({
         }),
         finish: R.assoc("isNewFolderLoading", false)
       });
+    },
+    deleteFolder(state, action) {
+      return handle(state, action, {
+        start: R.evolve({
+          data: R.map(
+            R.when(R.propEq("id", action.meta.folderId), R.assoc("hide", true))
+          )
+        }),
+        failure: prevState => {
+          notification.error({
+            message: "Error",
+            description: "There was an error trying to delete the folder"
+          });
+
+          return R.evolve({
+            data: R.map(
+              R.when(R.propEq("id", action.meta.folderId)),
+              R.dissoc("hide")
+            )
+          })(prevState);
+        },
+        success: R.evolve({
+          data: R.reject(R.propEq("id", action.meta.folderId))
+        })
+      });
     }
   }
 });
 
-export { loadFolders, createFolder };
+export { loadFolders, createFolder, deleteFolder };
 export default foldersSlice.reducer;

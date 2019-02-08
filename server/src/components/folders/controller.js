@@ -58,8 +58,29 @@ const updateFolder = (req, res) => {
     .catch(err => res.status(500).send({ error: err }));
 };
 
+const deleteFolder = (req, res) => {
+  const folderId = req.params.id;
+
+  folderService
+    .deleteFromUser(req.userId, folderId)
+    .then(folder => {
+      if (!folder) {
+        return res.status(404).send({
+          error: "Folder not found for the user"
+        });
+      }
+      return res.status(200).send(folder);
+    })
+    .catch(err =>
+      res.status(500).send({
+        error: err
+      })
+    );
+};
+
 module.exports = {
   getFolders,
   addFolder,
-  updateFolder
+  updateFolder,
+  deleteFolder
 };

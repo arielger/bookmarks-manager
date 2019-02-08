@@ -79,6 +79,7 @@ const Bookmarks = connect(
     return (
       <Wrapper>
         <Sidebar
+          folderId={folderId}
           showAddBookmark={() => {
             setBookmarkModal({ isOpen: true });
           }}

@@ -17,6 +17,7 @@ module.exports.set = app => {
   app.get("/folders", verifyToken, folderController.getFolders);
   app.post("/folders", verifyToken, folderController.addFolder);
   app.put("/folders/:id", verifyToken, folderController.updateFolder);
+  app.delete("/folders/:id", verifyToken, folderController.deleteFolder);
 
   // Tags
   app.get("/tags", verifyToken, tagController.getTags);

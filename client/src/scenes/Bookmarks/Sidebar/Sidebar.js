@@ -6,7 +6,11 @@ import { NavLink as RRNavLink } from "react-router-dom";
 import styled from "styled-components/macro";
 
 import CreateFolderButton from "./CreateFolderButton";
-import { loadFolders, createFolder } from "../../../store/folders";
+import {
+  loadFolders,
+  createFolder,
+  deleteFolder
+} from "../../../store/folders";
 
 const SidebarWrapper = styled.div`
   background-color: #f1f3f5;
@@ -48,12 +52,20 @@ const Link = styled(RRNavLink)`
   padding: 10px 30px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   color: #212529;
 
   &:hover,
   &:focus {
     background-color: rgba(0, 0, 0, 0.1);
     text-decoration: none;
+    .delete-btn {
+      display: inline-block;
+    }
+  }
+
+  .delete-btn {
+    display: none;
   }
 
   &.active {
@@ -61,7 +73,7 @@ const Link = styled(RRNavLink)`
     color: #f8f9fa;
   }
 
-  .anticon {
+  .folder-icon {
     margin-right: 12px;
   }
 `;
@@ -72,61 +84,91 @@ const Sidebar = connect(
   }),
   {
     loadFolders,
-    createFolder
+    createFolder,
+    deleteFolder
   }
-)(({ loadFolders, createFolder, folders, logout, showAddBookmark }) => {
-  React.useEffect(() => {
-    loadFolders();
-  }, []);
+)(
+  ({
+    loadFolders,
+    createFolder,
+    deleteFolder,
+    folders,
+    logout,
+    showAddBookmark
+  }) => {
+    React.useEffect(() => {
+      loadFolders();
+    }, []);
 
-  return (
-    <SidebarWrapper>
-      <Title>
-        <span role="img" aria-labelledby="bookmarks">
-          📌
-        </span>
-      </Title>
-      <FoldersContainer>
-        <Link to="/" exact style={{ marginBottom: "16px" }}>
-          <Icon type="pushpin" />
-          All bookmarks
-        </Link>
-        <h4>Folders</h4>
-        <FolderList>
-          {folders &&
-            folders.map(folder => (
-              <Link to={`/folders/${folder.id}`}>
-                <Icon type="folder" />
-                {folder.title}
-              </Link>
-            ))}
-        </FolderList>
-      </FoldersContainer>
-      <CreateFolderButton createFolder={createFolder} />
-      <BottomContainer>
-        <Button
-          type="primary"
-          icon="plus"
-          size="large"
-          block={true}
-          className="button"
-          onClick={showAddBookmark}
-          style={{ marginBottom: 12 }}
-        >
-          Add bookmark
-        </Button>
-        <Button
-          type="default"
-          icon="logout"
-          size="large"
-          block={true}
-          onClick={logout}
-        >
-          Log out
-        </Button>
-      </BottomContainer>
-    </SidebarWrapper>
-  );
-});
+    return (
+      <SidebarWrapper>
+        <Title>
+          <span role="img" aria-labelledby="bookmarks">
+            📌
+          </span>
+        </Title>
+        <FoldersContainer>
+          <Link to="/" exact style={{ marginBottom: "16px" }}>
+            <div>
+              <Icon type="pushpin" className="folder-icon" />
+              All bookmarks
+            </div>
+          </Link>
+          <h4>Folders</h4>
+          <FolderList>
+            {folders &&
+              folders.map(folder => (
+                <Link to={`/folders/${folder.id}`}>
+                  <div>
+                    <Icon type="folder" className="folder-icon" />
+                    {folder.title}
+                  </div>
+                  <Button
+                    className="delete-btn"
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          `Are you sure you want to delete the folder "${
+                            folder.title
+                          }"? This will also delete all bookmarks inside the folder`
+                        )
+                      ) {
+                        deleteFolder(folder.id);
+                      }
+                    }}
+                    type="danger"
+                    icon="delete"
+                  />
+                </Link>
+              ))}
+          </FolderList>
+        </FoldersContainer>
+        <CreateFolderButton createFolder={createFolder} />
+        <BottomContainer>
+          <Button
+            type="primary"
+            icon="plus"
+            size="large"
+            block={true}
+            className="button"
+            onClick={showAddBookmark}
+            style={{ marginBottom: 12 }}
+          >
+            Add bookmark
+          </Button>
+          <Button
+            type="default"
+            icon="logout"
+            size="large"
+            block={true}
+            onClick={logout}
+          >
+            Log out
+          </Button>
+        </BottomContainer>
+      </SidebarWrapper>
+    );
+  }
+);
 
 export default Sidebar;
