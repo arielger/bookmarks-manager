@@ -45,6 +45,7 @@ const FolderForm = ({
       title="Edit folder"
       visible={visible}
       width={400}
+      onCancel={closeModal}
       destroyOnClose={true}
       footer={
         <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -81,8 +82,12 @@ const FolderForm = ({
       <Form onSubmit={handleSubmit} layout="vertical" hideRequiredMark={true}>
         <Form.Item label="Title">
           {getFieldDecorator("title", {
-            required: true,
-            message: "Please input a title",
+            rules: [
+              {
+                required: true,
+                message: "Please enter a title"
+              }
+            ],
             initialValue: folder.title
           })(<Input type="text" placeholder="Title" />)}
         </Form.Item>

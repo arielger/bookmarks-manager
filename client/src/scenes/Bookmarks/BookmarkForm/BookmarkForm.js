@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { Form, Icon, Input, Modal } from "antd";
 import validator from "validator";
@@ -77,8 +77,12 @@ const BookmarkForm = ({
         </Form.Item>
         <Form.Item label="Title">
           {getFieldDecorator("title", {
-            required: true,
-            message: "Please input a title",
+            rules: [
+              {
+                required: true,
+                message: "Please enter a title"
+              }
+            ],
             initialValue: bookmarkData.title
           })(<Input type="text" placeholder="Title" />)}
         </Form.Item>
