@@ -54,7 +54,7 @@ const Link = styled(RRNavLink)`
   padding: 10px 30px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: start;
   color: #212529;
 
   &:hover,
@@ -67,6 +67,7 @@ const Link = styled(RRNavLink)`
   }
 
   .edit-btn {
+    margin-left: auto;
     display: none;
   }
 
@@ -74,10 +75,16 @@ const Link = styled(RRNavLink)`
     background-color: #339af0;
     color: #f8f9fa;
   }
+`;
 
-  .folder-icon {
-    margin-right: 12px;
-  }
+const FolderIcon = styled.div`
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-right: 12px;
 `;
 
 const Sidebar = connect(
@@ -122,20 +129,24 @@ const Sidebar = connect(
         </Title>
         <FoldersContainer>
           <Link to="/" exact style={{ marginBottom: "16px" }}>
-            <div>
+            <FolderIcon>
               <Icon type="pushpin" className="folder-icon" />
-              All bookmarks
-            </div>
+            </FolderIcon>
+            <span style={{ marginTop: 4 }}>All bookmarks</span>
           </Link>
           <h4>Folders</h4>
           <FolderList>
             {folders &&
               folders.map(folder => (
                 <Link to={`/folders/${folder.id}`} key={folder.id}>
-                  <div>
-                    <Icon type="folder" className="folder-icon" />
-                    {folder.title}
-                  </div>
+                  {folder.icon ? (
+                    <FolderIcon>{folder.icon}</FolderIcon>
+                  ) : (
+                    <FolderIcon>
+                      <Icon type="folder" className="folder-icon" />
+                    </FolderIcon>
+                  )}
+                  <span style={{ marginTop: 4 }}>{folder.title}</span>
                   <Button
                     onClick={() =>
                       setFolderModal({ isOpen: true, id: folder.id })

@@ -5,6 +5,7 @@ const axios = require("axios");
 const sequelizeToJoi = require("@revolttv/sequelize-to-joi").default;
 const { isURL } = require("validator");
 const bookmarkService = require("./service");
+const folderService = require("../folders/service");
 const db = require("../../database/models");
 
 const isValidNumber = R.both(R.is(Number), R.complement(R.equals(NaN)));
@@ -125,6 +126,20 @@ const addBookmark = async (req, res) => {
         }
       }
     });
+  }
+
+  if (bookmarkData.folderId) {
+    const folder = await folderService.getByIdFromUser(
+      req.userId,
+      bookmarkData.folderId
+    );
+    if (!folder) {
+      return res.status(400).send({
+        error: `The user doesn't have any folder with the id: ${
+          bookmarkData.folderId
+        }`
+      });
+    }
   }
 
   return bookmarkService

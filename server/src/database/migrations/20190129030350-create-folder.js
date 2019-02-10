@@ -15,6 +15,10 @@ module.exports = {
             type: Sequelize.STRING,
             notEmpty: true
           },
+          icon: {
+            type: Sequelize.STRING,
+            notEmpty: true
+          },
           userId: {
             type: Sequelize.INTEGER,
             references: {

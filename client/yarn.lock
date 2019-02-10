@@ -1140,6 +1140,10 @@ aproba@^1.0.3, aproba@^1.1.1:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-1.2.0.tgz#6802e6264efd18c790a1b0d517f0f2627bf2c94a"
 
+are-passive-events-supported@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/are-passive-events-supported/-/are-passive-events-supported-1.1.0.tgz#c806af550915c1302d881bb87db7f7722689fed7"
+
 are-we-there-yet@~1.1.2:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/are-we-there-yet/-/are-we-there-yet-1.1.5.tgz#4b35c2944f062a8bfcda66410760350fe9ddfc21"
@@ -2952,6 +2956,10 @@ elliptic@^6.0.0:
     inherits "^2.0.1"
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.0"
+
+emoji-mart@^2.9.2:
+  version "2.9.2"
+  resolved "https://registry.yarnpkg.com/emoji-mart/-/emoji-mart-2.9.2.tgz#03d1a3011e9d5fa7cd184fe308b7b803e6901ae2"
 
 emoji-regex@^6.5.1:
   version "6.5.1"
@@ -9248,6 +9256,12 @@ url@^0.11.0:
   dependencies:
     punycode "1.3.2"
     querystring "0.2.0"
+
+use-onclickoutside@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/use-onclickoutside/-/use-onclickoutside-0.3.0.tgz#a7c6bb68c8643c9a3437e34840d0cb2b96ae32b1"
+  dependencies:
+    are-passive-events-supported "^1.1.0"
 
 use@^3.1.0:
   version "3.1.1"

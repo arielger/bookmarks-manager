@@ -77,12 +77,6 @@ const BookmarkForm = ({
         </Form.Item>
         <Form.Item label="Title">
           {getFieldDecorator("title", {
-            rules: [
-              {
-                required: true,
-                message: "Please enter a title"
-              }
-            ],
             initialValue: bookmarkData.title
           })(<Input type="text" placeholder="Title" />)}
         </Form.Item>

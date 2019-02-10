@@ -12,9 +12,7 @@ const getFolders = (req, res) =>
   folderService.getAllFromUser(req.userId).then(data => res.send(data));
 
 const addFolder = (req, res) => {
-  const folderData = R.pick(["title"], req.body);
-
-  const validationResult = Joi.validate(folderData, folderValidator);
+  const validationResult = Joi.validate(req.body, folderValidator);
 
   if (validationResult.error) {
     return res.status(400).send({
@@ -35,18 +33,35 @@ const addFolder = (req, res) => {
   }
 
   return folderService
-    .add(req.userId, folderData)
+    .add(req.userId, req.body)
     .then(data => res.status(200).send(data));
 };
 
 const updateFolder = (req, res) => {
   const folderId = req.params.id;
-  const updatedData = {
-    title: req.body.title
-  };
 
-  folderService
-    .updateByIdFromUser(req.userId, folderId, updatedData)
+  const validationResult = Joi.validate(req.body, folderValidator);
+
+  if (validationResult.error) {
+    return res.status(400).send({
+      status: "failed",
+      error: {
+        original: validationResult.error._object, // eslint-disable-line no-underscore-dangle
+        details: R.fromPairs(
+          validationResult.error.details.map(({ message, type, path }) => [
+            path,
+            {
+              message: message.replace(/['"]/g, ""),
+              type
+            }
+          ])
+        )
+      }
+    });
+  }
+
+  return folderService
+    .updateByIdFromUser(req.userId, folderId, req.body)
     .then(folder => {
       if (!folder) {
         return res.status(404).send({

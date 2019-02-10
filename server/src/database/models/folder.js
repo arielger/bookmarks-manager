@@ -5,6 +5,10 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true
     },
+    icon: {
+      type: DataTypes.STRING,
+      notEmpty: true
+    },
     title: {
       type: DataTypes.STRING,
       notEmpty: true

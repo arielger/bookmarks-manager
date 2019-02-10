@@ -13,6 +13,9 @@ const add = (userId, folder) =>
     userId
   });
 
+const getByIdFromUser = (userId, id) =>
+  Folder.findOne({ where: { id, userId } });
+
 const updateByIdFromUser = (userId, folderId, updatedData) =>
   Folder.update(updatedData, {
     returning: true,
@@ -28,6 +31,7 @@ const deleteFromUser = (userId, id) =>
 
 module.exports = {
   getAllFromUser,
+  getByIdFromUser,
   add,
   updateByIdFromUser,
   deleteFromUser
