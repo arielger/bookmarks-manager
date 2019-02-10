@@ -14,6 +14,14 @@ const createBookmark = bookmarkData => ({
   promise: bookmarksApi.create(bookmarkData)
 });
 
+const editBookmark = (bookmarkData, bookmarkId) => ({
+  type: "editBookmark",
+  promise: bookmarksApi.update(bookmarkData, bookmarkId),
+  meta: {
+    bookmarkId
+  }
+});
+
 const deleteBookmark = bookmarkId => ({
   type: "deleteBookmark",
   promise: bookmarksApi.delete(bookmarkId),
@@ -27,6 +35,7 @@ const bookmarksSlice = createSlice({
   initialState: {
     isLoading: false,
     isNewBookmarkLoading: false,
+    isEditBookmarkLoading: false,
     morePagesAvailable: true,
     data: []
   },
@@ -71,6 +80,28 @@ const bookmarksSlice = createSlice({
         finish: R.assoc("isNewBookmarkLoading", false)
       });
     },
+    editBookmark(state, action) {
+      return handle(state, action, {
+        start: R.assoc("isEditBookmarkLoading", true),
+        failure: prevState => {
+          notification.error({
+            message: "Error",
+            description: "There was an error trying to edit the bookmark"
+          });
+
+          return prevState;
+        },
+        success: R.evolve({
+          data: R.map(
+            R.when(
+              R.propEq("id", action.meta.bookmarkId),
+              R.mergeLeft(action.payload)
+            )
+          )
+        }),
+        finish: R.assoc("isEditBookmarkLoading", false)
+      });
+    },
     deleteBookmark(state, action) {
       return handle(state, action, {
         start: R.evolve({
@@ -104,5 +135,11 @@ const bookmarksSlice = createSlice({
 
 const { actions, reducer } = bookmarksSlice;
 const { changeFolder } = actions;
-export { loadBookmarksPage, createBookmark, deleteBookmark, changeFolder };
+export {
+  loadBookmarksPage,
+  createBookmark,
+  editBookmark,
+  deleteBookmark,
+  changeFolder
+};
 export default reducer;

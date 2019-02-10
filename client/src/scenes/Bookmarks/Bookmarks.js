@@ -10,6 +10,7 @@ import Sidebar from "./Sidebar";
 import {
   loadBookmarksPage,
   createBookmark,
+  editBookmark,
   deleteBookmark,
   changeFolder
 } from "../../store/bookmarks";
@@ -40,11 +41,13 @@ const Bookmarks = connect(
     bookmarks: R.reject(R.propEq("hide", true), bookmarks.data),
     isLoading: bookmarks.isLoading,
     isNewBookmarkLoading: bookmarks.isNewBookmarkLoading,
+    isEditBookmarkLoading: bookmarks.isEditBookmarkLoading,
     morePagesAvailable: bookmarks.morePagesAvailable
   }),
   {
     loadBookmarksPage,
     createBookmark,
+    editBookmark,
     deleteBookmark,
     changeFolder
   }
@@ -53,6 +56,7 @@ const Bookmarks = connect(
     bookmarks = [],
     isLoading,
     isNewBookmarkLoading,
+    isEditBookmarkLoading,
     morePagesAvailable,
     loadBookmarksPage,
     createBookmark,
@@ -69,12 +73,9 @@ const Bookmarks = connect(
       id: undefined
     });
 
-    React.useEffect(
-      () => {
-        changeFolder();
-      },
-      [folderId]
-    );
+    React.useEffect(() => {
+      changeFolder();
+    }, [folderId]);
 
     return (
       <Wrapper>
@@ -136,7 +137,7 @@ const Bookmarks = connect(
         </ListWrapper>
         <BookmarkForm
           isNew={!bookmarkModal.id}
-          isLoading={isNewBookmarkLoading}
+          isLoading={isNewBookmarkLoading || isEditBookmarkLoading}
           bookmarkData={
             bookmarkModal.id
               ? bookmarks.find(b => b.id === bookmarkModal.id)
