@@ -105,6 +105,21 @@ const foldersSlice = createSlice({
         }),
         finish: R.assoc("isDeleteFolderLoading", false)
       });
+    },
+    createBookmark(state, action) {
+      return handle(state, action, {
+        success: prevState => {
+          if (!action.payload.folderId) return prevState;
+          return R.evolve({
+            data: R.map(
+              R.when(
+                R.propEq("id", action.payload.folderId),
+                R.evolve({ bookmarksCount: R.inc })
+              )
+            )
+          })(prevState);
+        }
+      });
     }
   }
 });

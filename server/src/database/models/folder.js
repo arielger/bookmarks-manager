@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
   });
   Folder.associate = models => {
     Folder.belongsTo(models.User, { foreignKey: "userId" });
+    Folder.hasMany(models.Bookmark, { foreignKey: "folderId" });
   };
   return Folder;
 };

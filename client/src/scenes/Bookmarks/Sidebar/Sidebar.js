@@ -64,6 +64,14 @@ const Link = styled(RRNavLink)`
     .edit-btn {
       display: inline-block;
     }
+    .bookmarks-count {
+      display: none;
+    }
+  }
+
+  .bookmarks-count {
+    display: inline-block;
+    margin-left: auto;
   }
 
   .edit-btn {
@@ -147,6 +155,11 @@ const Sidebar = connect(
                     </FolderIcon>
                   )}
                   <span style={{ marginTop: 4 }}>{folder.title}</span>
+                  {folder.bookmarksCount > 0 && (
+                    <span className="bookmarks-count">
+                      {folder.bookmarksCount}
+                    </span>
+                  )}
                   <Button
                     onClick={() =>
                       setFolderModal({ isOpen: true, id: folder.id })

@@ -1,10 +1,23 @@
+const Sequelize = require("sequelize");
 const db = require("../../database/models");
 
-const { Folder } = db;
+const { Folder, Bookmark } = db;
 
 const getAllFromUser = userId =>
   Folder.findAll({
-    where: { userId }
+    where: { userId },
+    attributes: {
+      include: [
+        [Sequelize.fn("COUNT", Sequelize.col("Bookmarks.id")), "bookmarksCount"]
+      ]
+    },
+    include: [
+      {
+        model: Bookmark,
+        attributes: []
+      }
+    ],
+    group: ["Folder.id"]
   });
 
 const add = (userId, folder) =>
