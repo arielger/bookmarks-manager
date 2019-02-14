@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled from "styled-components/macro";
 import { Form, Button, Input, Modal, Icon } from "antd";
 import emojis from "emoji-mart/data/apple.json";
 import "emoji-mart/css/emoji-mart.css";
@@ -89,15 +89,12 @@ const useCloseModalAfterLoading = (isLoading, closeModal) => {
   // Prevent closing modal in first render
   const isFirstRender = React.useRef(true);
 
-  React.useEffect(
-    () => {
-      if (!isLoading && !isFirstRender.current) {
-        closeModal();
-      }
-      isFirstRender.current = false;
-    },
-    [isLoading]
-  );
+  React.useEffect(() => {
+    if (!isLoading && !isFirstRender.current) {
+      closeModal();
+    }
+    isFirstRender.current = false;
+  }, [isLoading]);
 };
 
 const FolderForm = ({

@@ -4,9 +4,9 @@ import { handle } from "redux-pack";
 import { notification } from "antd";
 import { bookmarks as bookmarksApi } from "../api";
 
-const loadBookmarksPage = (page, folderId) => ({
+const loadBookmarksPage = (page, folderId, search) => ({
   type: "loadBookmarksPage",
-  promise: bookmarksApi.fetch(page, folderId)
+  promise: bookmarksApi.fetch(page, folderId, search)
 });
 
 const createBookmark = bookmarkData => ({
@@ -40,7 +40,7 @@ const bookmarksSlice = createSlice({
     data: []
   },
   reducers: {
-    changeFolder(state) {
+    resetBookmarksList(state) {
       return R.mergeLeft({
         morePagesAvailable: true,
         data: []
@@ -134,12 +134,12 @@ const bookmarksSlice = createSlice({
 });
 
 const { actions, reducer } = bookmarksSlice;
-const { changeFolder } = actions;
+const { resetBookmarksList } = actions;
 export {
   loadBookmarksPage,
   createBookmark,
   editBookmark,
   deleteBookmark,
-  changeFolder
+  resetBookmarksList
 };
 export default reducer;

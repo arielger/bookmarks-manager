@@ -4,20 +4,29 @@ import { connect } from "react-redux";
 import { List, Avatar, Button } from "antd";
 import styled from "styled-components/macro";
 import humanizeUrl from "humanize-url";
+import qs from "qs";
 import InfiniteScroll from "react-infinite-scroller";
 import BookmarkForm from "./BookmarkForm";
 import Sidebar from "./Sidebar";
+import Header from "./Header";
 import {
   loadBookmarksPage,
   createBookmark,
   editBookmark,
   deleteBookmark,
-  changeFolder
+  resetBookmarksList
 } from "../../store/bookmarks";
 
 const Wrapper = styled.div`
   display: flex;
   height: 100vh;
+`;
+
+const Content = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
 `;
 
 const ListWrapper = styled.div`
@@ -49,7 +58,7 @@ const Bookmarks = connect(
     createBookmark,
     editBookmark,
     deleteBookmark,
-    changeFolder
+    resetBookmarksList
   }
 )(
   ({
@@ -62,11 +71,22 @@ const Bookmarks = connect(
     createBookmark,
     editBookmark,
     deleteBookmark,
-    changeFolder,
+    resetBookmarksList,
     logout,
-    match
+    match,
+    history,
+    location
   }) => {
-    const folderId = R.path(["params", "folderId"], match);
+    const folderId = R.pipe(
+      R.path(["params", "folderId"]),
+      folderId => parseInt(folderId, 10),
+      R.defaultTo(undefined)
+    )(match);
+
+    const search = R.prop(
+      "search",
+      qs.parse(location.search, { ignoreQueryPrefix: true })
+    );
 
     const [bookmarkModal, setBookmarkModal] = React.useState({
       isOpen: false,
@@ -74,8 +94,8 @@ const Bookmarks = connect(
     });
 
     React.useEffect(() => {
-      changeFolder();
-    }, [folderId]);
+      resetBookmarksList();
+    }, [folderId, search]);
 
     return (
       <Wrapper>
@@ -86,55 +106,58 @@ const Bookmarks = connect(
           }}
           logout={logout}
         />
-        <ListWrapper>
-          <InfiniteScroll
-            key={folderId}
-            initialLoad={true}
-            loadMore={page => loadBookmarksPage(page, folderId)}
-            hasMore={!isLoading && morePagesAvailable}
-            useWindow={false}
-          >
-            <List
-              className="bookmarks-list"
-              itemLayout="horizontal"
-              dataSource={bookmarks}
-              loading={isLoading}
-              renderItem={bookmark => (
-                <List.Item
-                  actions={[
-                    <Button
-                      icon="edit"
-                      onClick={() => {
-                        setBookmarkModal({ isOpen: true, id: bookmark.id });
-                      }}
-                    />,
-                    <Button
-                      icon="delete"
-                      type="danger"
-                      onClick={() => {
-                        deleteBookmark(bookmark.id);
-                      }}
-                    />
-                  ]}
-                >
-                  <List.Item.Meta
-                    avatar={
-                      <Avatar
-                        shape="square"
-                        size="large"
-                        icon="link"
-                        src={`https://logo-core.clearbit.com/${bookmark.url}`}
-                        className="avatar"
+        <Content>
+          <Header history={history} location={location} folderId={folderId} />
+          <ListWrapper>
+            <InfiniteScroll
+              key={`${folderId}-${search}`}
+              initialLoad={true}
+              loadMore={page => loadBookmarksPage(page, folderId, search)}
+              hasMore={!isLoading && morePagesAvailable}
+              useWindow={false}
+            >
+              <List
+                className="bookmarks-list"
+                itemLayout="horizontal"
+                dataSource={bookmarks}
+                loading={isLoading}
+                renderItem={bookmark => (
+                  <List.Item
+                    actions={[
+                      <Button
+                        icon="edit"
+                        onClick={() => {
+                          setBookmarkModal({ isOpen: true, id: bookmark.id });
+                        }}
+                      />,
+                      <Button
+                        icon="delete"
+                        type="danger"
+                        onClick={() => {
+                          deleteBookmark(bookmark.id);
+                        }}
                       />
-                    }
-                    title={bookmark.title}
-                    description={humanizeUrl(bookmark.url)}
-                  />
-                </List.Item>
-              )}
-            />
-          </InfiniteScroll>
-        </ListWrapper>
+                    ]}
+                  >
+                    <List.Item.Meta
+                      avatar={
+                        <Avatar
+                          shape="square"
+                          size="large"
+                          icon="link"
+                          src={`https://logo-core.clearbit.com/${bookmark.url}`}
+                          className="avatar"
+                        />
+                      }
+                      title={bookmark.title}
+                      description={humanizeUrl(bookmark.url)}
+                    />
+                  </List.Item>
+                )}
+              />
+            </InfiniteScroll>
+          </ListWrapper>
+        </Content>
         <BookmarkForm
           isNew={!bookmarkModal.id}
           isLoading={isNewBookmarkLoading || isEditBookmarkLoading}

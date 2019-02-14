@@ -26,11 +26,12 @@ export const users = {
 };
 
 export const bookmarks = {
-  fetch: (page, folderId) =>
+  fetch: (page, folderId, search) =>
     axios.get(
       `/bookmarks?${qs.stringify({
         page: page || 1,
-        folderId
+        folderId,
+        search
       })}`
     ),
   create: bookmark => axios.post("/bookmarks", bookmark),

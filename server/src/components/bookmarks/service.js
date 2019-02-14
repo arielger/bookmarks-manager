@@ -2,11 +2,20 @@ const db = require("../../database/models");
 
 const { Bookmark } = db;
 
-const getFromUser = (userId, pageSize, page, folderId) =>
+const getFromUser = ({ userId, pageSize, page, folderId, search }) =>
   Bookmark.findAndCountAll({
     where: {
       userId,
-      ...(folderId ? { folderId } : {})
+      ...(folderId ? { folderId } : {}),
+      ...(search
+        ? {
+            $or: [
+              { url: { like: `%${search}%` } },
+              { title: { like: `%${search}%` } },
+              { description: { like: `%${search}%` } }
+            ]
+          }
+        : {})
     },
     limit: pageSize,
     offset: (page - 1) * pageSize

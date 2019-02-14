@@ -48,7 +48,13 @@ const getBookmarks = (req, res) => {
   )(req.query.folderId);
 
   bookmarkService
-    .getFromUser(req.userId, PAGE_SIZE, page, folderId)
+    .getFromUser({
+      userId: req.userId,
+      pageSize: PAGE_SIZE,
+      page,
+      folderId,
+      search: req.query.search
+    })
     .then(result => {
       const pageCount = Math.ceil(result.count / PAGE_SIZE);
       const morePagesAvailable = pageCount > page;
