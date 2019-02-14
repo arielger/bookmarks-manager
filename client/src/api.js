@@ -17,6 +17,10 @@ axios.interceptors.request.use(function(config) {
 });
 
 axios.interceptors.response.use(R.propOr({}, "data"), function(error) {
+  if (error.response.status === 403) {
+    sessionStorage.removeItem("jwtToken");
+    window.location.reload(true);
+  }
   return Promise.reject(R.pathOr({}, ["response", "data"], error));
 });
 

@@ -3,7 +3,7 @@ import * as R from "ramda";
 import styled from "styled-components/macro";
 import { connect } from "react-redux";
 import qs from "qs";
-import { Input, Icon } from "antd";
+import { Input } from "antd";
 
 const Wrapper = styled.div`
   display: flex;
