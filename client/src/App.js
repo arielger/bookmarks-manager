@@ -1,57 +1,27 @@
-import React, { Component } from "react";
+import React from "react";
+import { connect } from "react-redux";
 import { Route, Switch, Redirect } from "react-router-dom";
 
 import { SignUp, LogIn, Bookmarks } from "./scenes";
 
-class App extends Component {
-  state = {
-    userToken: sessionStorage.getItem("jwtToken") || ""
-  };
-
-  setUserToken = userToken => {
-    sessionStorage.setItem("jwtToken", userToken);
-    this.setState({ userToken });
-  };
-
-  logout = () => {
-    sessionStorage.removeItem("jwtToken");
-    this.setState({ userToken: "" });
-  };
-
-  render() {
-    const isAuthenticated = !!this.state.userToken;
-
-    return (
-      <div className="App">
-        <Switch>
-          {!isAuthenticated && (
-            <Switch>
-              <Route
-                path="/signup"
-                render={() => <SignUp setUserToken={this.setUserToken} />}
-              />
-              <Route
-                path="/login"
-                render={() => <LogIn setUserToken={this.setUserToken} />}
-              />
-              <Redirect to="/login" />
-            </Switch>
-          )}
-          <Route
-            path={["/folders/:folderId", "/"]}
-            render={props => (
-              <Bookmarks
-                logout={this.logout}
-                userToken={this.state.userToken}
-                {...props}
-              />
-            )}
-          />
-          <Redirect to="/" />
-        </Switch>
-      </div>
-    );
-  }
-}
+const App = connect(({ user }) => ({
+  isAuthenticated: user.isAuthenticated
+}))(({ isAuthenticated }) => {
+  return (
+    <div className="App">
+      <Switch>
+        {!isAuthenticated && (
+          <Switch>
+            <Route path="/signup" component={SignUp} />
+            <Route path="/login" component={LogIn} />
+            <Redirect to="/login" />
+          </Switch>
+        )}
+        <Route path={["/folders/:folderId", "/"]} component={Bookmarks} />
+        <Redirect to="/" />
+      </Switch>
+    </div>
+  );
+});
 
 export default App;

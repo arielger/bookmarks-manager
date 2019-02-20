@@ -1,9 +1,10 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import { Form, Icon, Input, Button, Checkbox, message } from "antd";
+import React from "react";
+import { connect } from "react-redux";
+import { Form, Icon, Input, Button, Checkbox } from "antd";
 import { Link } from "react-router-dom";
 import styled from "styled-components/macro";
-import { users as usersApi } from "../../api";
+
+import { logIn } from "../../store/user";
 
 const FormWrapper = styled.div`
   max-width: 320px;
@@ -23,112 +24,84 @@ const LinksContainer = styled.div`
   text-align: center;
 `;
 
-class LogIn extends Component {
-  state = {
-    isLoading: false,
-    showPassword: false
-  };
+const LogIn = connect(
+  ({ user }) => ({ isLoading: user.isLoading }),
+  { logIn }
+)(({ form, isLoading, logIn }) => {
+  const { getFieldDecorator } = form;
+  const [showPassword, setShowPassword] = React.useState(false);
 
-  static propTypes = {
-    setUserToken: PropTypes.func.isRequired
-  };
-
-  handleSubmit = e => {
-    const { form } = this.props;
+  const handleSubmit = e => {
     e.preventDefault();
 
     form.validateFields((err, values) => {
       if (!err) {
-        this.setState({ isLoading: true });
-        usersApi
-          .login(values)
-          .then(({ token }) => {
-            this.props.setUserToken(token);
-            this.setState({ isLoading: false });
-          })
-          .catch(error => {
-            message.error(
-              "Unable to login. Please check your email and password and try again."
-            );
-            form.setFieldsValue({
-              password: ""
-            });
-            this.setState({ isLoading: false });
-          });
+        logIn(values, form);
       }
     });
   };
 
-  toggleShowPassword = () => {
-    this.setState(prevState => ({
-      showPassword: !prevState.showPassword
-    }));
-  };
-
-  render() {
-    const { getFieldDecorator } = this.props.form;
-    const { isLoading, showPassword } = this.state;
-
-    return (
-      <FormWrapper>
-        <h1>Log in</h1>
-        <Form onSubmit={this.handleSubmit} layout="vertical">
-          <Form.Item>
-            {getFieldDecorator("email", {
-              rules: [
-                {
-                  type: "email",
-                  message: "The input is not a valid email!"
-                },
-                {
-                  required: true,
-                  message: "Please input your email"
-                }
-              ]
-            })(
-              <Input
-                prefix={<Icon type="mail" />}
-                placeholder="Email"
-                size="large"
-              />
-            )}
-          </Form.Item>
-          <Form.Item className="password-container">
-            {getFieldDecorator("password", {
-              rules: [{ required: true, message: "Please input your password" }]
-            })(
-              <Input
-                prefix={<Icon type="lock" />}
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                size="large"
-              />
-            )}
-          </Form.Item>
-          <Checkbox
-            className="show-password"
-            onChange={this.toggleShowPassword}
-          >
-            Show password
-          </Checkbox>
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
+  return (
+    <FormWrapper>
+      <h1>Log in</h1>
+      <Form onSubmit={handleSubmit} layout="vertical">
+        <Form.Item>
+          {getFieldDecorator("email", {
+            rules: [
+              {
+                type: "email",
+                message: "The input is not a valid email!"
+              },
+              {
+                required: true,
+                message: "Please input your email"
+              }
+            ]
+          })(
+            <Input
+              prefix={<Icon type="mail" />}
+              placeholder="Email"
               size="large"
-              loading={isLoading}
-              block
-            >
-              Log In
-            </Button>
-            <LinksContainer>
-              <Link to="/signup">Sign up ›</Link>
-            </LinksContainer>
-          </Form.Item>
-        </Form>
-      </FormWrapper>
-    );
-  }
-}
+              autoComplete="username"
+            />
+          )}
+        </Form.Item>
+        <Form.Item className="password-container">
+          {getFieldDecorator("password", {
+            rules: [{ required: true, message: "Please input your password" }]
+          })(
+            <Input
+              prefix={<Icon type="lock" />}
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              size="large"
+              autoComplete="current-password"
+            />
+          )}
+        </Form.Item>
+        <Checkbox
+          className="show-password"
+          onChange={() => setShowPassword(!showPassword)}
+        >
+          Show password
+        </Checkbox>
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            size="large"
+            loading={isLoading}
+            block
+          >
+            Log In
+          </Button>
+          <LinksContainer>
+            <Link to="/signup">Sign up ›</Link>
+          </LinksContainer>
+        </Form.Item>
+      </Form>
+    </FormWrapper>
+  );
+});
 
 export default Form.create()(LogIn);

@@ -72,7 +72,6 @@ const Bookmarks = connect(
     editBookmark,
     deleteBookmark,
     resetBookmarksList,
-    logout,
     match,
     history,
     location
@@ -104,7 +103,6 @@ const Bookmarks = connect(
           showAddBookmark={() => {
             setBookmarkModal({ isOpen: true });
           }}
-          logout={logout}
         />
         <Content>
           <Header history={history} location={location} folderId={folderId} />

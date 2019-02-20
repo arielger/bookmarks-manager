@@ -13,6 +13,7 @@ import {
   editFolder,
   deleteFolder
 } from "../../../store/folders";
+import { logout } from "../../../store/user";
 
 const SidebarWrapper = styled.div`
   background-color: #f1f3f5;
@@ -105,7 +106,8 @@ const Sidebar = connect(
     loadFolders,
     createFolder,
     editFolder,
-    deleteFolder
+    deleteFolder,
+    logout
   }
 )(
   ({
@@ -189,7 +191,9 @@ const Sidebar = connect(
             icon="logout"
             size="large"
             block={true}
-            onClick={logout}
+            onClick={() => {
+              logout();
+            }}
           >
             Log out
           </Button>

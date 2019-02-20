@@ -1,9 +1,11 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import { Form, Icon, Input, Button, message } from "antd";
+import React from "react";
+import { connect } from "react-redux";
+import { Form, Icon, Input, Button } from "antd";
 import { Link } from "react-router-dom";
 import styled from "styled-components/macro";
-import { users as usersApi } from "../../api";
+import { GoogleLogin } from "react-google-login";
+
+import { signUp } from "../../store/user";
 
 const FormWrapper = styled.div`
   max-width: 320px;
@@ -15,110 +17,104 @@ const LinksContainer = styled.div`
   text-align: center;
 `;
 
-class SignUp extends Component {
-  static propTypes = {
-    setUserToken: PropTypes.func.isRequired
-  };
+const SignUp = connect(
+  ({ user }) => ({ isLoading: user.isLoading }),
+  { signUp }
+)(({ form, signUp, isLoading }) => {
+  const { getFieldDecorator } = form;
 
-  handleSubmit = e => {
+  const handleSubmit = e => {
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
+    form.validateFields((err, values) => {
       if (!err) {
-        usersApi
-          .signup(values)
-          .then(({ token }) => {
-            this.props.setUserToken(token);
-          })
-          // @todo: Refactor axios error handling
-          .catch(error => {
-            if (error.response) {
-              const errorData = error.response.data.error;
-              this.props.form.setFields({
-                email: {
-                  value: this.props.form.getFieldValue("email"),
-                  errors: errorData.details.email && [
-                    new Error(errorData.details.email.message)
-                  ]
-                },
-                password: {
-                  value: "",
-                  errors: errorData.details.password && [
-                    new Error(errorData.details.password.message)
-                  ]
-                }
-              });
-            } else {
-              message.error(
-                "There was an error trying to create your account."
-              );
-            }
-          });
+        signUp(values, form);
       }
     });
   };
 
-  render() {
-    const { getFieldDecorator } = this.props.form;
+  return (
+    <FormWrapper>
+      <h1>Sign up</h1>
+      {/* <GoogleLogin
+        clientId="715918354633-f88ortu45c1cmcl64hb1i2mqdqons0bk.apps.googleusercontent.com"
+        buttonText="Sign up with Google"
+        onSuccess={response => {
+          console.log("s", response);
 
-    return (
-      <FormWrapper>
-        <h1>Sign up</h1>
-        <Form onSubmit={this.handleSubmit} layout="vertical">
-          <Form.Item>
-            {getFieldDecorator("email", {
-              rules: [
-                {
-                  type: "email",
-                  message: "The input is not a valid email!"
-                },
-                {
-                  required: true,
-                  message: "Please input your email"
-                }
-              ]
-            })(
-              <Input
-                prefix={<Icon type="mail" />}
-                placeholder="Email"
-                size="large"
-              />
-            )}
-          </Form.Item>
-          <Form.Item>
-            {getFieldDecorator("password", {
-              rules: [
-                { required: true, message: "Please input your password" },
-                {
-                  min: 6,
-                  message: "The password should have at least 6 characters"
-                },
-                {
-                  max: 128,
-                  message:
-                    "The password should not have more than 128 characters"
-                }
-              ]
-            })(
-              <Input
-                prefix={<Icon type="lock" />}
-                type="password"
-                placeholder="Password"
-                size="large"
-              />
-            )}
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" size="large" block>
-              Register
-            </Button>
-            <LinksContainer>
-              <Link to="/login">Log In ›</Link>
-            </LinksContainer>
-          </Form.Item>
-        </Form>
-      </FormWrapper>
-    );
-  }
-}
+          axios
+            .post("http://localhost:5000/auth/google", {
+              access_token: response.accessToken
+            })
+            .then(response => {
+              console.log("response", response);
+            });
+        }}
+        onFailure={e => {
+          console.log("e", e);
+        }}
+      /> */}
+      <Form onSubmit={handleSubmit} layout="vertical">
+        <Form.Item>
+          {getFieldDecorator("email", {
+            rules: [
+              {
+                type: "email",
+                message: "The input is not a valid email!"
+              },
+              {
+                required: true,
+                message: "Please input your email"
+              }
+            ]
+          })(
+            <Input
+              prefix={<Icon type="mail" />}
+              autoComplete="username"
+              placeholder="Email"
+              size="large"
+            />
+          )}
+        </Form.Item>
+        <Form.Item>
+          {getFieldDecorator("password", {
+            rules: [
+              { required: true, message: "Please input your password" },
+              {
+                min: 6,
+                message: "The password should have at least 6 characters"
+              },
+              {
+                max: 128,
+                message: "The password should not have more than 128 characters"
+              }
+            ]
+          })(
+            <Input
+              prefix={<Icon type="lock" />}
+              type="password"
+              placeholder="Password"
+              size="large"
+              autoComplete="new-password"
+            />
+          )}
+        </Form.Item>
+        <Form.Item>
+          <Button
+            loading={isLoading}
+            type="primary"
+            htmlType="submit"
+            size="large"
+            block
+          >
+            Register
+          </Button>
+          <LinksContainer>
+            <Link to="/login">Log In ›</Link>
+          </LinksContainer>
+        </Form.Item>
+      </Form>
+    </FormWrapper>
+  );
+});
 
 export default Form.create()(SignUp);
