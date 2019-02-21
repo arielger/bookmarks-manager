@@ -34,7 +34,7 @@ const getBookmarkDefaults = async bookmark => {
   }
 };
 
-// @todo: Implement filtering, sorting
+// @todo: Implement sorting
 const getBookmarks = (req, res) => {
   const PAGE_SIZE = 10;
   const page = R.pipe(

@@ -26,7 +26,16 @@ axios.interceptors.response.use(R.propOr({}, "data"), function(error) {
 
 export const users = {
   login: user => axios.post("/users/login", user),
-  signup: user => axios.post("/users/signup", user)
+  signup: user => axios.post("/users/signup", user),
+  logInWithProvider: (provider, accessToken, isSignUp) =>
+    axios.post(
+      `/auth/${provider}?${qs.stringify({
+        isSignUp
+      })}`,
+      {
+        access_token: accessToken
+      }
+    )
 };
 
 export const bookmarks = {

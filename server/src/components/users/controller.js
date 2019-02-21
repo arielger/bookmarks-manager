@@ -3,8 +3,10 @@ const bcrypt = require("bcrypt");
 const Joi = require("joi");
 const sequelizeToJoi = require("@revolttv/sequelize-to-joi").default;
 const R = require("ramda");
+const normalizeEmail = require("normalize-email");
 const db = require("../../database/models");
 const userService = require("./service");
+const { googleAuthResults } = require("../../authentication/google");
 
 const { User } = db;
 
@@ -19,10 +21,10 @@ const userValidator = sequelizeToJoi(User)
   });
 
 const signUp = async (req, res) => {
-  const userData = R.pick(
-    ["firstName", "lastName", "password", "email"],
-    req.body
-  );
+  const userData = R.pipe(
+    R.pick(["firstName", "lastName", "password", "email"]),
+    R.evolve({ email: normalizeEmail })
+  )(req.body);
 
   // @todo: Move joi validation to middleware
   const validationResult = Joi.validate(userData, userValidator);
@@ -124,6 +126,32 @@ const logIn = (req, res) => {
     .catch(err => res.status(500).send(`Error on the server: ${err}`));
 };
 
+const logInWithProvider = (req, res) => {
+  if (!req.user) {
+    return res.send(401, "User Not Authenticated");
+  }
+
+  let message;
+
+  if (req.user.result === googleAuthResults.LINK) {
+    message = `There was already an account with your email (${
+      req.user.email
+    }). From now on you can log in with Google or email.`;
+  } else if (
+    req.query.isSignUp &&
+    req.user.result === googleAuthResults.EXISTING
+  ) {
+    message = `User ${req.user.firstName} ${
+      req.user.lastName
+    } at Google already had an account so you have been logged in.`;
+  }
+
+  const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, {
+    expiresIn: "24h"
+  });
+  return res.status(200).send({ auth: true, token, message });
+};
+
 const logOut = (req, res) => {
   res.status(200).send({ auth: false, token: null });
 };
@@ -132,5 +160,6 @@ module.exports = {
   signUp,
   me,
   logIn,
+  logInWithProvider,
   logOut
 };

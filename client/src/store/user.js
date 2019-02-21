@@ -2,7 +2,7 @@ import * as R from "ramda";
 import { createSlice } from "redux-starter-kit";
 import { handle } from "redux-pack";
 import { users as usersApi } from "../api";
-import { message } from "antd";
+import { message as antdMessage } from "antd";
 
 const signUp = (values, form) => ({
   type: "signUp",
@@ -14,7 +14,7 @@ const signUp = (values, form) => ({
     // Handle form errors without storing them in redux store
     onFailure: response => {
       if (!R.path(["error", "details"], response)) {
-        message.error("There was an error trying to create your account.");
+        antdMessage.error("There was an error trying to create your account.");
       } else {
         const details = response.error.details;
         form.setFields({
@@ -40,12 +40,31 @@ const logIn = (values, form) => ({
       sessionStorage.setItem("jwtToken", token);
     },
     onFailure: response => {
-      message.error(
+      antdMessage.error(
         "Unable to login. Please check your email and password and try again."
       );
       form.setFieldsValue({
         password: ""
       });
+    }
+  }
+});
+
+const logInWithProvider = (provider, accessToken, isSignUp) => ({
+  type: "logInWithProvider",
+  promise: usersApi.logInWithProvider(provider, accessToken, isSignUp),
+  meta: {
+    onSuccess: ({ token, message }) => {
+      sessionStorage.setItem("jwtToken", token);
+
+      if (message) {
+        antdMessage.success(message, 5);
+      }
+    },
+    onFailure: () => {
+      antdMessage.error(
+        `There was an error trying to log in with ${provider}.`
+      );
     }
   }
 });
@@ -67,6 +86,7 @@ const userSlice = createSlice({
     }
   },
   extraReducers: {
+    // @todo: Refactor signUp, logIn and logInWithProvider to share same logic
     signUp(state, action) {
       return handle(state, action, {
         start: R.assoc("isLoading", true),
@@ -88,11 +108,22 @@ const userSlice = createSlice({
           )(prevState),
         finish: R.assoc("isLoading", false)
       });
+    },
+    logInWithProvider(state, action) {
+      return handle(state, action, {
+        start: R.assoc("isLoading", true),
+        success: prevState =>
+          R.pipe(
+            R.assoc("token", action.payload.token),
+            R.assoc("isAuthenticated", true)
+          )(prevState),
+        finish: R.assoc("isLoading", false)
+      });
     }
   }
 });
 
 const { actions, reducer } = userSlice;
 const { logout } = actions;
-export { signUp, logIn, logout };
+export { signUp, logIn, logInWithProvider, logout };
 export default reducer;

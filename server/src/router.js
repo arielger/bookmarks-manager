@@ -1,3 +1,4 @@
+const passport = require("passport");
 const bookmarkController = require("./components/bookmarks/controller");
 const folderController = require("./components/folders/controller");
 const tagController = require("./components/tags/controller");
@@ -29,4 +30,13 @@ module.exports.set = app => {
   app.get("/users/me", verifyToken, userController.me);
   app.post("/users/logout", userController.logOut);
   app.post("/users/signup", userController.signUp);
+
+  app.post(
+    "/auth/google",
+    passport.authenticate("google-token", {
+      session: false,
+      scope: ["profile", "email"]
+    }),
+    userController.logInWithProvider
+  );
 };

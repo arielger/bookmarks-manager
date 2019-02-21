@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const passport = require("passport");
 
 dotenv.config();
 
@@ -17,6 +18,9 @@ app.use(
     extended: true
   })
 );
+app.use(passport.initialize());
+require("./authentication/google");
+
 router.set(app);
 
 app.use((req, res) => {

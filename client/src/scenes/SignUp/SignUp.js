@@ -1,15 +1,42 @@
 import React from "react";
 import { connect } from "react-redux";
-import { Form, Icon, Input, Button } from "antd";
+import { Form, Icon, Input, Button, Checkbox } from "antd";
 import { Link } from "react-router-dom";
 import styled from "styled-components/macro";
 import { GoogleLogin } from "react-google-login";
 
-import { signUp } from "../../store/user";
+import { signUp, logInWithProvider } from "../../store/user";
+
+const Title = styled.h1`
+  text-align: center;
+  margin-bottom: 32px;
+`;
 
 const FormWrapper = styled.div`
   max-width: 320px;
   margin: 60px auto 0;
+
+  .password-container {
+    margin-bottom: 4px;
+  }
+
+  .show-password {
+    margin-bottom: 24px;
+  }
+`;
+
+const SocialProviders = styled.div`
+  padding-bottom: 24px;
+  border-bottom: 1px solid #f1f3f5;
+  margin-bottom: 24px;
+
+  .google-btn {
+    width: 100%;
+
+    svg {
+      display: block;
+    }
+  }
 `;
 
 const LinksContainer = styled.div`
@@ -19,9 +46,10 @@ const LinksContainer = styled.div`
 
 const SignUp = connect(
   ({ user }) => ({ isLoading: user.isLoading }),
-  { signUp }
-)(({ form, signUp, isLoading }) => {
+  { signUp, logInWithProvider }
+)(({ form, signUp, logInWithProvider, isLoading }) => {
   const { getFieldDecorator } = form;
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const handleSubmit = e => {
     e.preventDefault();
@@ -34,25 +62,20 @@ const SignUp = connect(
 
   return (
     <FormWrapper>
-      <h1>Sign up</h1>
-      {/* <GoogleLogin
-        clientId="715918354633-f88ortu45c1cmcl64hb1i2mqdqons0bk.apps.googleusercontent.com"
-        buttonText="Sign up with Google"
-        onSuccess={response => {
-          console.log("s", response);
-
-          axios
-            .post("http://localhost:5000/auth/google", {
-              access_token: response.accessToken
-            })
-            .then(response => {
-              console.log("response", response);
-            });
-        }}
-        onFailure={e => {
-          console.log("e", e);
-        }}
-      /> */}
+      <Title>Sign up</Title>
+      <SocialProviders>
+        <GoogleLogin
+          clientId={process.env.REACT_APP_GOOGLE_CLIENTID}
+          buttonText="Sign up with Google"
+          className="google-btn"
+          onSuccess={response => {
+            logInWithProvider("google", response.accessToken, true);
+          }}
+          onFailure={e => {
+            console.log("Error logging in with Google: ", e);
+          }}
+        />
+      </SocialProviders>
       <Form onSubmit={handleSubmit} layout="vertical">
         <Form.Item>
           {getFieldDecorator("email", {
@@ -75,7 +98,7 @@ const SignUp = connect(
             />
           )}
         </Form.Item>
-        <Form.Item>
+        <Form.Item className="password-container">
           {getFieldDecorator("password", {
             rules: [
               { required: true, message: "Please input your password" },
@@ -91,13 +114,19 @@ const SignUp = connect(
           })(
             <Input
               prefix={<Icon type="lock" />}
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Password"
               size="large"
               autoComplete="new-password"
             />
           )}
         </Form.Item>
+        <Checkbox
+          className="show-password"
+          onChange={() => setShowPassword(!showPassword)}
+        >
+          Show password
+        </Checkbox>
         <Form.Item>
           <Button
             loading={isLoading}
@@ -109,7 +138,7 @@ const SignUp = connect(
             Register
           </Button>
           <LinksContainer>
-            <Link to="/login">Log In ›</Link>
+            Already have an account? <Link to="/login">Log In ›</Link>
           </LinksContainer>
         </Form.Item>
       </Form>
