@@ -12,11 +12,12 @@ const signUp = (values, form) => ({
       sessionStorage.setItem("jwtToken", token);
     },
     // Handle form errors without storing them in redux store
-    onFailure: response => {
-      if (!R.path(["error", "details"], response)) {
+    onFailure: error => {
+      const details = R.propOr({}, "details", error);
+
+      if (!details) {
         antdMessage.error("There was an error trying to create your account.");
       } else {
-        const details = response.error.details;
         form.setFields({
           email: {
             value: form.getFieldValue("email"),
@@ -65,6 +66,29 @@ const logInWithProvider = (provider, accessToken, isSignUp) => ({
       antdMessage.error(
         `There was an error trying to log in with ${provider}.`
       );
+    }
+  }
+});
+
+const forgotPassword = (email, handleSuccess) => ({
+  type: "forgotPassword",
+  promise: usersApi.forgotPassword(email),
+  meta: {
+    onSuccess: () => {
+      handleSuccess();
+    },
+    onFailure: () => {
+      antdMessage.error(`There was an error sending the reset instructions.`);
+    }
+  }
+});
+
+const resetPassword = (newPassword, token) => ({
+  type: "resetPassword",
+  promise: usersApi.resetPassword(newPassword, token),
+  meta: {
+    onFailure: () => {
+      antdMessage.error(`There was an error trying to reset your password.`);
     }
   }
 });
@@ -125,5 +149,12 @@ const userSlice = createSlice({
 
 const { actions, reducer } = userSlice;
 const { logout } = actions;
-export { signUp, logIn, logInWithProvider, logout };
+export {
+  signUp,
+  logIn,
+  logInWithProvider,
+  forgotPassword,
+  resetPassword,
+  logout
+};
 export default reducer;

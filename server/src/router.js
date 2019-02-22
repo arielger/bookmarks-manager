@@ -30,6 +30,8 @@ module.exports.set = app => {
   app.get("/users/me", verifyToken, userController.me);
   app.post("/users/logout", userController.logOut);
   app.post("/users/signup", userController.signUp);
+  app.post("/users/forgot-password", userController.forgotPassword);
+  app.post("/users/reset-password", userController.resetPassword);
 
   app.post(
     "/auth/google",

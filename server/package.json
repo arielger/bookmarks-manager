@@ -13,7 +13,8 @@
     "db:seed:all": "./node_modules/.bin/sequelize db:seed:all",
     "db:seed:undo:all": "./node_modules/.bin/sequelize db:seed:undo:all",
     "db:migrations:all": "./node_modules/.bin/sequelize db:migrate",
-    "db:migrations:undo:all": "./node_modules/.bin/sequelize db:migrate:undo:all"
+    "db:migrations:undo:all": "./node_modules/.bin/sequelize db:migrate:undo:all",
+    "db:migration:create": "./node_modules/.bin/sequelize migration:generate"
   },
   "husky": {
     "hooks": {
@@ -32,6 +33,7 @@
     "axios": "^0.18.0",
     "bcrypt": "^3.0.0",
     "body-parser": "^1.18.3",
+    "celebrate": "^9.0.2",
     "cheerio": "^1.0.0-rc.2",
     "cors": "^2.8.5",
     "dotenv": "^6.0.0",
@@ -41,15 +43,19 @@
     "joi": "^13.6.0",
     "jsonwebtoken": "^8.3.0",
     "lodash.samplesize": "^4.2.0",
+    "ms": "^2.1.1",
+    "nodemailer": "^5.1.1",
     "normalize-email": "^1.1.1",
     "passport": "^0.4.0",
     "passport-google-token": "^0.1.2",
     "pg": "^7.4.3",
+    "qs": "^6.6.0",
     "ramda": "^0.25.0",
     "random-int": "^1.0.0",
     "sequelize": "^4.42.0",
     "sequelize-cli": "^4.1.0",
     "superagent": "^3.8.3",
+    "uuid": "^3.3.2",
     "validator": "^10.8.0"
   },
   "devDependencies": {

@@ -40,7 +40,7 @@ const SocialProviders = styled.div`
 `;
 
 const LinksContainer = styled.div`
-  margin-top: 16px;
+  margin-top: 24px;
   text-align: center;
 `;
 
@@ -129,7 +129,10 @@ const LogIn = connect(
             Log In
           </Button>
           <LinksContainer>
-            Don't have an account? <Link to="/signup">Sign up ›</Link>
+            <div style={{ marginBottom: 10 }}>
+              Don't have an account? <Link to="/signup">Sign up ›</Link>
+            </div>
+            <Link to="/password/forgot">Forgot your password?</Link>
           </LinksContainer>
         </Form.Item>
       </Form>

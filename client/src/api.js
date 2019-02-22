@@ -35,7 +35,10 @@ export const users = {
       {
         access_token: accessToken
       }
-    )
+    ),
+  forgotPassword: email => axios.post("/users/forgot-password", { email }),
+  resetPassword: (newPassword, token) =>
+    axios.post("/users/reset-password", { newPassword, token })
 };
 
 export const bookmarks = {

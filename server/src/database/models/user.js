@@ -31,6 +31,14 @@ module.exports = (sequelize, DataTypes) => {
       notEmpty: true,
       unique: true
     },
+    resetPasswordToken: {
+      type: DataTypes.UUID,
+      notEmpty: true
+    },
+    resetPasswordExpires: {
+      type: DataTypes.DATE,
+      notEmpty: true
+    },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE
   });
